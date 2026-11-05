@@ -22,6 +22,7 @@
 
 - **Seamly2D（GPLv3）：** 有无界面导出模式（`-m` 围度、`-b` 输出名、`-d` 目录、`-f` 格式：SVG=0、PDF=1、DXF R10=6，多码 `-x/-gheight`）。agent 可以批量导出，但写 `.val` 原型仍是 GUI 活儿；GPL 代码不嵌进闭源产品，只当外部工具。
 - **商业软件（CLO3D、Style3D、Gerber、Lectra、Optitex）：** 只走用户自己的授权和安装，不替用户注册、不绕授权。DXF-AAMA/ASTM 是工厂互通的格式目标，garment.dev 的做法（放码 X/Y 规则 + 校验报告、排料约束、34 个主流 CAD 文件对过）是工业门槛参考，不是可复用的开源代码。
+- **DXF-AAMA 写盘（本 skill 自有，2026-11-05）：** 见 `references/aama-dxf.md`；实现 `scripts/to-dxf-v3.py`（R12、标准层、双份刀口、双份片名、显式封口），验收用回读校验。Teagan 单码 M 已出 `teagan-fitted-v3.dxf` 并全项通过；ETCAD 读回实测待用户做。
 
 ## 本仓 v0.1 不承诺的事
 

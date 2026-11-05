@@ -1,10 +1,10 @@
 ---
 name: pattern-making
-version: 0.1.0
+version: 0.1.2
 description: Garment pattern work driven by an agent. Use when the user asks for a sewing pattern, a toile/sample pattern, grading, a DXF for a factory, or a pattern check. Turns a user requirement into a versioned pattern job: requirement sheet first, measurements from the locked size tables, deterministic geometry by script/engine (never coordinates computed in the agent's head), a validation gate, and a human approval gate before any factory release or sample cut.
 ---
 
-# Pattern Making (skill, v0.1.0)
+# Pattern Making (skill, v0.1.2)
 
 这是一个制版 skill，不是已经会画西装纸样的程序。它把用户需求变成版本化的纸样 job：先写结构单，围度只认锁定的表，几何由确定性脚本或引擎算，校验门 + 审批门通过后才能放行。
 
