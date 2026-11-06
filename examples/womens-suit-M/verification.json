@@ -1,1 +1,0 @@
-{"checks":["grading invariants pass for S-3XL (chest-waist 16, jacket-trousers waist 6, hip diff 0)","job contract check passes (normal check)","release check intentionally fails: no approval.md and open items remain"],"engine":"grading.py","note":"This example proves measurements + grading + gate only. It is NOT a paper pattern.","status":"pass","version":"v0.1"}

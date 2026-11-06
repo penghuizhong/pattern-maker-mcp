@@ -10,10 +10,10 @@ python3 scripts/check_job.py --job jobs/<款号> --release
 普通检查（不带 `--release`）查：
 
 1. `requirements.md`、`measurements.json`、`design.json` 存在且 JSON 合法；
-2. `measurements.json` 引用的表在 `measurements/` 里存在，码段在表里齐全；
+2. `measurements.json` 标明来源（用户量体或用户多码表），agent 不猜数；
 3. `design.json` 的 `open_items` 和 `requirements.md` 的 OPEN 项一致（不能一边写 OPEN、一边当定稿）；
 4. 本版 `outputs/<版本>/` 存在，`verification.json` 存在；
-5. 放码恒量自检通过（由 verification.json 里的记录证明）。
+5. 放码恒量自检通过（多码表时，表内恒量全码一致；由 verification.json 里的记录证明）。
 
 ## 机器门：几何校验（有产物时必做）
 

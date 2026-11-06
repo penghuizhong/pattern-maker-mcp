@@ -11,6 +11,10 @@
 - job-contract.md 补 approval.md 模板格式（日期、版本、放行范围、已知风险；对齐 check_job.py --release 的四点检查）。
 - references/ 只留 aama-dxf.md、job-contract.md、validation-gate.md：curves.md、engines.md、grading.md、measurements.md 已删；SKILL.md 第 2、3 步的引用同步改成直接表述（按表验算恒量、曲线纪律一行）。
 - 再重构：SKILL.md 改写成两条通用流程（FreeSewing 生成、DXF 复刻）；Python/GarmentCode 生成路线删掉（没跑通过的链路）；pattern.py 悬空引用随之消除。
+- dxf_plot.py：user-dxf-1 的 plot_numbered_full.py 通用化进仓（`--in/--out/--title`，ezdxf + matplotlib，按层着色、# 编号、闭合封口）；跑裤子 1.dxf 与编号图 v2 逐像素一致（10 片、191 个 #，4680×3240）。
+- 清西装旧数据：examples/womens-suit-M/ 与 measurements/（男女西装表）已删；围度改一律用户给（measurements.json 必须标 source，check_job.py 改查 source 不再查锁表）；job-contract.md（garment 品类名、engine 两链）、validation-gate.md（门第 2、5 项）、README（仓里有什么、快速验证改临时 job）同步改。
+- job-contract.md 的 OPEN 项规则一节按用户要求删除（OPEN 概念仍在 SKILL.md 第 1 步与 validation-gate.md 人门里）。
+- SKILL.md 去下游表述：删“样衣不能先裁”（第 1 步）、“DXF 不能发工厂、样衣不能裁、文件不能对外发布”（铁律 3）、frontmatter 的 "factory release or sample cut"——只出纸样阶段，不写没发生的事；再删两句范围声明（“轮廓核验通过不等于合体、不等于生产可用”“量化只证明几何，不证明合体”）。
 
 ## 2026-11-05（晚上）—— 缝份角改尖角
 

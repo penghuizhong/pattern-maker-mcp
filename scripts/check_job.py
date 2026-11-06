@@ -5,9 +5,10 @@ Usage:
   python3 scripts/check_job.py --job jobs/<款号>
   python3 scripts/check_job.py --job jobs/<款号> --release
 
-Normal check: required files exist, JSON parses, sizes exist in the
-locked tables, open_items agree between design.json and requirements.md,
-and a verification.json exists for the current version.
+Normal check: required files exist, JSON parses, measurements.json states
+its source (user-supplied numbers, never guessed), open_items agree
+between design.json and requirements.md, and a verification.json exists
+for the current version.
 --release additionally requires: verification status == pass,
 approval.md with an explicit user release record, and no open items
 (or open items explicitly accepted as known risk in approval.md).
@@ -20,9 +21,6 @@ import json
 import re
 import sys
 from pathlib import Path
-
-SKILL_DIR = Path(__file__).resolve().parent.parent
-
 
 def fail(errors, msg):
     errors.append(msg)
@@ -58,18 +56,14 @@ def main():
         except json.JSONDecodeError as e:
             fail(errors, f"measurements.json is not valid JSON: {e}")
 
-    # 2. Measurements reference the locked tables and sizes exist there
+    # 2. Measurements are user-supplied and state their source (never guessed)
     if measurements is not None:
-        garment = measurements.get("garment")
-        sizes = measurements.get("sizes", [])
-        table_p = SKILL_DIR / "measurements" / f"{garment}.json" if garment else None
-        if not table_p or not table_p.exists():
-            fail(errors, f"measurements.json garment '{garment}' has no locked table in measurements/")
-        else:
-            table = json.loads(table_p.read_text(encoding="utf-8"))
-            for s in sizes:
-                if s not in table["jacket"] or s not in table["trousers"]:
-                    fail(errors, f"size {s} not in locked table {garment}")
+        source = measurements.get("source")
+        if not source or not isinstance(source, str):
+            fail(errors, "measurements.json has no 'source' (where the numbers came from)")
+        sizes = measurements.get("sizes")
+        if sizes is not None and (not isinstance(sizes, list) or not sizes):
+            fail(errors, "measurements.json 'sizes' must be a non-empty list")
 
     # 3. open_items agreement
     open_items = []
