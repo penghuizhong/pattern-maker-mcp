@@ -7,6 +7,7 @@
 - `SKILL.md` — 触发条件、铁律、工作流
 - `references/` — DXF-AAMA 规范、job 契约、校验门
 - `scripts/` — 校验（check_job.py）、DXF 量化（dxf_quantify.py）、DXF 写盘（to-dxf-v3.py）、编号图（dxf_plot.py）
+- `server/` — 同一套工具的 CLI + MCP 服务器（`pattern` 命令，4 个带类型签名的工具）。skill 是用法说明，server 是可执行的实现；见 `server/README.md`。
 
 ## 使用
 

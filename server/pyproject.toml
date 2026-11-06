@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pattern-making"
+version = "0.1.0"
+description = "Pattern-making tools: DXF quantify/plot/write (AAMA) and job validation gate — CLI + MCP server"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "ezdxf>=1.4",
+    "matplotlib>=3.6",
+    "fastmcp>=2.0",
+]
+
+[project.scripts]
+pattern = "pattern_making.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
