@@ -11,7 +11,7 @@ Tools:
                     file; unmeasurable entities listed under `unsupported`)
   plot_numbered_dxf DXF -> numbered verification PNG (layer 2 black #,
                     layer 4 red #, cm units)
-  write_dxf_aama    JSON paths -> DXF-AAMA (R12, Teagan layout)
+  write_dxf_aama    JSON paths -> DXF-AAMA (R12, three-piece tee layout)
   reanchor_segments anchors JSON + new DXF -> segments re-derived by
                     position (block-local anchor coords) and re-measured
   check_job         validation gate on a job folder (normal + --release)
@@ -92,7 +92,7 @@ def write_dxf_aama(paths_json: str, out_dxf: str, miter: bool = False) -> dict:
     (Style.Piece.Size) + INSERT, standard layers 1/14/7/6/2/3/4, global
     # numbering per piece (seam walk then SA walk). With miter=True,
     SA bevel joins become sharp miter corners (garment-CAD
-    convention). Current scope: Teagan fitted tee layout
+    convention). Current scope: three-piece tee layout
     (FRONT/BACK/SLEEVE, single size M).
     """
     return write_dxf_mod.write_dxf(paths_json, out_dxf, miter=miter)

@@ -11,8 +11,8 @@ and writes a standard DXF-AAMA file (R12 / AC1009):
     14 sew line (net = seam outline, closed)
     7  grainline (+ arrowhead)
     6  mirror line (fold edge, front/back only)
-    8  internal lines (none in Teagan data; supported, empty here)
-    11 internal cut lines (none in Teagan data; supported, empty here)
+    8  internal lines (none in this fixture; supported, empty here)
+    11 internal cut lines (none in this fixture; supported, empty here)
     2  turn points (POINT + "# n" TEXT, height 10)
     3  curve points (POINT, no text)
     4  notch points (POINT + "# n" TEXT, height 10) + 12 mm tick LINEs
@@ -41,9 +41,9 @@ the intersection of the two adjacent offset edges' tangent lines
 the SA path is written exactly as given (v3).
 
 Library: write_dxf(input_path, output_path, miter=False) -> summary dict.
-CLI: `pattern write-dxf --input teagan-paths-v2.json --output teagan-fitted-v3.dxf [--miter]`
+CLI: `pattern write-dxf --input tee163-paths.json --output tee163.dxf [--miter]`
 
-Current scope: Teagan fitted tee layout (FRONT/BACK/SLEEVE, single size M).
+Current scope: three-piece tee layout (FRONT/BACK/SLEEVE, single size M).
 Style/size metadata are module constants for now; parameterizing them is
 future work.
 """
@@ -55,9 +55,9 @@ import sys
 import ezdxf
 from ezdxf.enums import TextEntityAlignment
 
-# --- Teagan example defaults (override via CLI / edit for another style) ---
-STYLE = "Teagan"
-STYLE_NAME = "Teagan Fitted Tee"
+# --- Tee163 example defaults (override via CLI / edit for another style) ---
+STYLE = "Tee163"
+STYLE_NAME = "163 T-shirt"
 SIZE = "M"
 MATERIAL = "KNIT"
 AUTHOR = "Muse"
@@ -514,8 +514,8 @@ def write_dxf(input_path, output_path, miter=False):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Write a DXF-AAMA file (R12) from JSON paths.")
-    ap.add_argument("--input", default="teagan-paths-v2.json")
-    ap.add_argument("--output", default="teagan-fitted-v3.dxf")
+    ap.add_argument("--input", default="tee163-paths.json")
+    ap.add_argument("--output", default="tee163.dxf")
     ap.add_argument("--miter", action="store_true",
                     help="replace SA bevel joins with miter (sharp) corners")
     args = ap.parse_args(argv)

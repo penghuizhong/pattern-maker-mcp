@@ -2,6 +2,12 @@
 
 按日期记。每次改动先写条目再发版；版本号只写在 SKILL.md 里（frontmatter 的 `version` 字段），发版时按它打 git tag。
 
+## 2026-11-06 — 清掉 Teagan 残留，write_dxf 夹具换成用户自己的 163 T 恤
+
+- 用户决定：项目里不留 FreeSewing 相关内容。`server/tests/fixtures/teagan-paths-v2.json`（FreeSewing Teagan 款点列）删掉；`write_dxf.py`、`cli.py`、`server.py`、`test_mcp_client.py`、`server/README.md`、SKILL.md、`references/aama-dxf.md` 里所有 "Teagan" 改名——夹具与款名改成用户的 163 T 恤（`tee163-paths.json`，STYLE=Tee163）。
+- 新夹具由用户自己的 163 T 恤模板量化数据生成：`jobs/tshirt-template/outputs/v0.1/quantified.json` 的前/后/袖三片，净线（层 14）作 seam、裁剪线（层 1）作 sa、丝缕线（层 7）作 grainline，坐标归一化为 Y-down 局部坐标，Douglas-Peucker 1.0 mm 简化（552→26 点/片）。回读验证：净线前片 271.0×684.8、周长 177.3 cm，与量化原值 270.9×684.8、177.4 cm 一致；裁剪线周长 +1.2 cm 是 --miter 尖角的正常增量。
+- MCP 测试断言同步改：write_dxf 171 个 #、0 个刀口（163 模板无刀口）。MCP 全套测试重跑通过。只改夹具与命名，不升版本。
+
 ## 2026-11-06 — 测试去掉硬编码路径（jobs 根目录可配置）
 
 - `server/tests/test_mcp_client.py` 的 4 个绝对路径全去掉：`SERVER` 与 `teagan-paths-v2.json` 夹具改从测试文件自身位置推导（`Path(__file__)`，跟仓走）；裤子 DXF 与 quantified.json 改从 jobs 根目录推导，根目录可配（环境变量 `PATTERN_JOBS_ROOT`），默认 `~/workspace/jobs/`（只是本地默认值，不是写死的 HOME）。默认与显式设 `PATTERN_JOBS_ROOT=~/workspace/jobs` 两种跑法 MCP 全套测试都通过。只改测试，不升版本。

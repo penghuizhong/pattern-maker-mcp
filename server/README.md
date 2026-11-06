@@ -45,7 +45,7 @@ python3 -m venv .venv
 ```bash
 pattern quantify --in 1.dxf --out quantified.json --by-block --decode-gbk --unit-factor 1
 pattern plot --in 1.dxf --out numbered.png [--title "标题"]
-pattern write-dxf --input teagan-paths-v2.json --output out.dxf [--miter]
+pattern write-dxf --input tee163-paths.json --output out.dxf [--miter]
 pattern check --job jobs/<款号> [--release]
 pattern serve   # start the MCP server (stdio)
 ```
@@ -87,15 +87,14 @@ Verified 2026-11-06 against the known files:
   `dxf_plot.py` under the same matplotlib. (PNG pixels differ from the
   stored `numbered-full-v2.png` only because the venv has matplotlib
   3.11.2 vs 3.6.3 when that file was drawn — the data is identical.)
-- `write-dxf --miter` on `teagan-paths-v2.json`: byte-identical to
-  `teagan-fitted-v3.1.dxf` except ezdxf's `$TDCREATE`/`$TDUPDATE`
-  timestamps; readback verify `ALL CHECKS PASSED` (#1–#102).
+- `write-dxf --miter` on `tee163-paths.json` (user's own 163 T-shirt,
+  simplified outlines): readback verify `ALL CHECKS PASSED` (#1–#171).
 - `check`: normal pass, `--release` without `approval.md` fails,
   `--release` with it passes — through both the CLI and the MCP tool.
 
 ## Known limits (v0.2.0)
 
-- `write_dxf_aama` is Teagan-only for now: FRONT/BACK/SLEEVE layout,
+- `write_dxf_aama` is three-piece-tee-only for now: FRONT/BACK/SLEEVE layout,
   single size M, style metadata hardcoded. Parameterizing it for
   other designs is separate work.
 - `plot` CJK fonts: Linux Noto Sans CJK path first, then macOS PingFang /

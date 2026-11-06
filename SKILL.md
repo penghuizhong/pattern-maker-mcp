@@ -49,7 +49,7 @@ description: "Garment pattern work: replicate and quantify a pattern from the us
 
 ## 出 DXF（可选）
 
-`write_dxf_aama` 工具（CLI：`pattern write-dxf`，`--miter` 把缝份角改尖角）把 JSON 点列写成 DXF-AAMA（R12、标准层号、每片一个块、刀口双份写、# 编号）。写完按 `references/aama-dxf.md` 的回读验收清单复核。规范见 `references/aama-dxf.md`。目前只支持 Teagan 版型布局（FRONT/BACK/SLEEVE，单码 M）。
+`write_dxf_aama` 工具（CLI：`pattern write-dxf`，`--miter` 把缝份角改尖角）把 JSON 点列写成 DXF-AAMA（R12、标准层号、每片一个块、刀口双份写、# 编号）。写完按 `references/aama-dxf.md` 的回读验收清单复核。规范见 `references/aama-dxf.md`。目前只支持三片式 T 恤布局（FRONT/BACK/SLEEVE，单码 M）。
 
 ## 校验
 

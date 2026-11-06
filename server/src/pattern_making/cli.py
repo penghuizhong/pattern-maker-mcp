@@ -31,8 +31,8 @@ def build_parser():
     p.add_argument("--title", default=None)
 
     p = sub.add_parser("write-dxf", help="write a DXF-AAMA file (R12) from JSON paths")
-    p.add_argument("--input", default="teagan-paths-v2.json")
-    p.add_argument("--output", default="teagan-fitted-v3.dxf")
+    p.add_argument("--input", default="tee163-paths.json")
+    p.add_argument("--output", default="tee163.dxf")
     p.add_argument("--miter", action="store_true",
                    help="replace SA bevel joins with miter (sharp) corners")
 

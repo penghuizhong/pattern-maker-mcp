@@ -19,7 +19,7 @@ from mcp.client.stdio import stdio_client
 # defaulting to ~/workspace/jobs/ (local default, not a fixed HOME).
 REPO = Path(__file__).resolve().parent.parent  # server/
 SERVER = str(REPO / ".venv" / "bin" / "pattern")
-TEAGAN_PATHS = str(Path(__file__).resolve().parent / "fixtures" / "teagan-paths-v2.json")
+TEE163_PATHS = str(Path(__file__).resolve().parent / "fixtures" / "tee163-paths.json")
 JOBS_ROOT = Path(os.environ.get("PATTERN_JOBS_ROOT", "~/workspace/jobs")).expanduser()
 TROUSER = str(JOBS_ROOT / "user-dxf-1" / "1.dxf")
 TROUSER_Q = str(JOBS_ROOT / "user-dxf-1" / "outputs" / "v0.1" / "quantified.json")
@@ -83,12 +83,12 @@ async def main():
             print("plot pieces:", len(r["pieces"]), "| total_labels:", r["total_labels"])
             assert r["total_labels"] == 191 and len(r["pieces"]) == 10
 
-            # 3. write-dxf --miter (from the stored Teagan paths JSON)
+            # 3. write-dxf --miter (from the stored 163 T-shirt paths JSON)
             r = tool_json(await session.call_tool("write_dxf_aama", {
-                "paths_json": TEAGAN_PATHS, "out_dxf": "/tmp/mcp-v3.dxf", "miter": True}))
+                "paths_json": TEE163_PATHS, "out_dxf": "/tmp/mcp-v3.dxf", "miter": True}))
             print("write_dxf pieces:", r["pieces"], "| numbers:", r["total_numbers"],
                   "| notches:", r["notches"])
-            assert r["total_numbers"] == 102 and r["notches"] == 4
+            assert r["total_numbers"] == 171 and r["notches"] == 0
 
             # 3b. reanchor: women's block v2 anchors onto the v3 DXF.
             # # numbers shuffled v2->v3, but every anchor must match and
