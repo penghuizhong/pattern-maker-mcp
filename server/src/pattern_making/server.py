@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """MCP server for pattern-making tools (stdio transport).
 
-Exposes the four tools as typed MCP tools; the agent calls these instead
+Exposes the six tools as typed MCP tools; the agent calls these instead
 of running scripts by path. Tool results are summaries + file paths --
 the full quantified JSON stays in the file it was written to, not in
 the conversation.
@@ -14,12 +14,18 @@ Tools:
   write_dxf_aama    JSON paths -> DXF-AAMA (R12, three-piece tee layout)
   reanchor_segments anchors JSON + new DXF -> segments re-derived by
                     position (block-local anchor coords) and re-measured
+  dxf_to_apattern   DXF + segments -> .apattern file (agent-era pattern
+                    format: named points/edges/segments, JSON)
   check_job         validation gate on a job folder (normal + --release)
 
 Run: `pattern serve` or `python -m pattern_making.server`.
 """
+import json
+from pathlib import Path
+
 from fastmcp import FastMCP
 
+from . import apattern as apattern_mod
 from . import check as check_mod
 from . import plot as plot_mod
 from . import quantify as quantify_mod
@@ -114,6 +120,36 @@ def reanchor_segments(anchors_path: str, dxf_path: str, out_json: str | None = N
     Returns the per-segment # mapping and lengths.
     """
     return reanchor_mod.reanchor(anchors_path, dxf_path, out_json, tolerance_cm)
+
+
+@mcp.tool
+def dxf_to_apattern(dxf_path: str, anchors_path: str, quantified_path: str,
+                    names_json: str, meta_json: str, out_path: str) -> dict:
+    """Convert a DXF version to a .apattern file (agent-era pattern format).
+
+    .apattern is semantic-first JSON (one style + one size per file):
+    named points/edges/segments replace volatile DXF # numbers, seam
+    allowance is a parameter, and production pairing checks (sleeve cap,
+    collar) are stored as data. The converter re-measures every recorded
+    segment and verifies each edge arc length against its segment length;
+    any mismatch over 0.05 cm raises an error instead of writing wrong
+    data. names_json carries the human point naming (# -> name per piece),
+    the segment-name mapping, and piece info; meta_json carries style,
+    size, source, and lineage. Returns the .apattern summary.
+    """
+    names = json.loads(Path(names_json).read_text(encoding="utf-8"))
+    meta = json.loads(Path(meta_json).read_text(encoding="utf-8"))
+    data = apattern_mod.dxf_to_apattern(
+        dxf_path, anchors_path, quantified_path, names, meta, out_path)
+    errors = apattern_mod.validate_apattern(data)
+    if errors:
+        raise ValueError("apattern schema errors: " + "; ".join(errors))
+    return {"out": out_path,
+            "pieces": len(data["pieces"]),
+            "points": sum(len(p["points"]) for p in data["pieces"].values()),
+            "segments": sum(len(p.get("segments", {})) for p in data["pieces"].values()),
+            "edges": sum(len(p.get("edges", {})) for p in data["pieces"].values()),
+            "checks": data.get("checks", [])}
 
 
 @mcp.tool

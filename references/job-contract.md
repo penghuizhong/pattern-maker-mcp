@@ -12,12 +12,19 @@
   measurements.json    # 围度：用户给的量体数据或多码表（必须标来源）
   design.json          # 款式参数（见下）
   outputs/v0.1/        # 本版产物
+    <款号>-<码>.apattern   # 纸样数据唯一源头（JSON，见 references/apattern.md）
+    numbered.png           # 编号图
+    verification.json      # 本版校验结果（机器门）
   outputs/v0.2/        # 下一版另建目录，绝不覆盖 v0.1
   verification.json    # 本版校验结果（机器门）
   approval.md          # 用户审批记录（人门，放行前必须有）
 ```
 
 复刻链多一个原文件在 job 根目录：`source.dxf`（用户发的原文件，不动；老 job 里原名保留，如 `1.dxf`、`tshirt.dxf`）。
+
+## .apattern（纸样数据唯一源头，v0.1.3 起）
+
+每版定稿后转一个 `.apattern`（JSON，一个款、一个码、一个文件），放进当版目录。它顶掉 `quantified.json` + `segments.md` + `segments-anchors.json` 三个散文件——点、轮廓、线段、缝份、校验全在里面（有名有姓的点/边/线段，块内坐标 cm）。格式标准见 `references/apattern-schema.json`，说明见 `references/apattern.md`，转换工具见 `server/src/pattern_making/apattern.py`（MCP `dxf_to_apattern` / CLI `pattern apattern`）。老版的三个散文件留着不动，不重写历史。
 
 ## design.json 字段（最小集）
 

@@ -59,7 +59,7 @@ async def main():
             names = [t.name for t in tools.tools]
             print("tools:", names)
             assert names == ["quantify_dxf", "plot_numbered_dxf", "write_dxf_aama",
-                             "reanchor_segments", "check_job"], names
+                             "reanchor_segments", "dxf_to_apattern", "check_job"], names
             for t in tools.tools:
                 print(f"  {t.name}: {json.dumps(t.input_schema.get('properties', {}), ensure_ascii=False)[:220]}")
 
@@ -110,6 +110,64 @@ async def main():
                 print("reanchor lengths == v2 lengths")
             else:
                 print("reanchor skipped: womens-block v2/v3 jobs not present")
+
+            # 3c. apattern: tshirt-165-96 v0.2 DXF -> first .apattern.
+            # Point naming is the human decision (which # is the armpit);
+            # the test records it inline. All 20 segment lengths must
+            # equal the anchors file, and both pairing checks must pass.
+            v02 = JOBS_ROOT / "tshirt-165-96" / "outputs" / "v0.2"
+            if (v02 / "source.dxf").exists() and (v02 / "segments-anchors.json").exists():
+                names = {
+                    "points": {
+                        "front": {"12": "hem_l", "13": "armpit_l", "14": "shoulder_joint_l",
+                                  "15": "shoulder_tip_l", "16": "neckline_c", "17": "shoulder_tip_r",
+                                  "18": "shoulder_joint_r", "19": "armpit_r", "20": "hem_r",
+                                  "26": "waist_r", "31": "chest_w_r", "36": "waist_l", "41": "chest_w_l"},
+                        "back": {"55": "hem_l", "56": "armpit_l", "57": "shoulder_joint_l",
+                                 "58": "shoulder_tip_l", "59": "neckline_c", "60": "shoulder_tip_r",
+                                 "61": "shoulder_joint_r", "62": "armpit_r", "63": "hem_r",
+                                 "64": "center_hem", "69": "back_w_l", "75": "waist_l",
+                                 "79": "back_w_r", "85": "waist_r"},
+                        "sleeve": {"96": "cuff_l", "97": "cap_l", "98": "cap_top",
+                                   "99": "cap_r", "100": "cuff_r", "105": "cuff_c"},
+                        "collar": {"119": "collar_l", "120": "collar_w", "123": "collar_r"}},
+                    "segments": {"前摆围": "hem", "前胸围": "chest", "前胸宽": "chest_width",
+                                 "前腰围": "waist", "前袖笼线（右）": "armhole_r",
+                                 "前袖笼线（左）": "armhole_l", "前领围线": "neckline",
+                                 "后中长": "center_length", "后摆围": "hem", "后背宽": "back_width",
+                                 "后胸围": "chest", "后腰围": "waist",
+                                 "后袖笼线（右）": "armhole_r", "后袖笼线（左）": "armhole_l",
+                                 "后领围线": "neckline", "袖口围": "cuff", "袖山线": "cap",
+                                 "袖长": "sleeve_length", "领宽": "width", "领长": "length"},
+                    "pieces": {
+                        "front": {"label": "前片", "material": "面料", "quantity": 1, "symmetric": True},
+                        "back": {"label": "后片", "material": "面料", "quantity": 1, "symmetric": True},
+                        "sleeve": {"label": "袖片", "material": "面料", "quantity": 2, "symmetric": True},
+                        "collar": {"label": "领片", "material": "罗纹", "quantity": 1, "symmetric": True}}}
+                meta = {"style": "男士165-96t-shirt", "size": "M",
+                        "source_dxf": "outputs/v0.2/source.dxf",
+                        "source_note": "BUYI-TECH DXF-AAMA R12, 2026/11/6, 完整可生产版",
+                        "derived_from": "tshirt-165-96 v0.1",
+                        "changes": ["半片改整片", "缝份 1.0 改 0.8（下摆 2.0）", "加袖、领", "前领加深 10.0 cm"]}
+                Path("/tmp/mcp-apattern-names.json").write_text(
+                    json.dumps(names, ensure_ascii=False), encoding="utf-8")
+                Path("/tmp/mcp-apattern-meta.json").write_text(
+                    json.dumps(meta, ensure_ascii=False), encoding="utf-8")
+                r = tool_json(await session.call_tool("dxf_to_apattern", {
+                    "dxf_path": str(v02 / "source.dxf"),
+                    "anchors_path": str(v02 / "segments-anchors.json"),
+                    "quantified_path": str(v02 / "quantified.json"),
+                    "names_json": "/tmp/mcp-apattern-names.json",
+                    "meta_json": "/tmp/mcp-apattern-meta.json",
+                    "out_path": "/tmp/mcp-tshirt-165-96-M.apattern"}))
+                print("apattern:", r["pieces"], "pieces,", r["points"], "points,",
+                      r["segments"], "segments,", r["edges"], "edges")
+                assert r["pieces"] == 4 and r["points"] == 36 and r["segments"] == 20
+                assert r["edges"] == 12
+                assert all(c["pass"] for c in r["checks"]), r["checks"]
+                print("apattern checks all pass")
+            else:
+                print("apattern skipped: tshirt-165-96 v0.2 job not present")
 
             # 4a. check normal + release (job has approval.md)
             r = tool_json(await session.call_tool("check_job", {"job_dir": JOB}))

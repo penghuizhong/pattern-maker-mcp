@@ -2,6 +2,15 @@
 
 按日期记。每次改动先写条目再发版；版本号只写在 SKILL.md 里（frontmatter 的 `version` 字段），发版时按它打 git tag。
 
+## 2026-11-06 — .apattern：agent 时代的纸样文件（v0.1）
+
+- 用户决定：定 agent 时代的纸样文件标准。DXF-AAMA 还是生产交换格式（给工厂/CAD），`.apattern`（JSON，一个款、一个码、一个文件）是 agent 的工作源头，两边各司其职。简单第一：单码走，放码另算；曲线先存实测多段线，不搞贝塞尔。
+- 新文件：`references/apattern-schema.json`（JSON Schema，格式标准，通用就靠它）、`references/apattern.md`（一页说明）、`server/src/pattern_making/apattern.py`（DXF → `.apattern` 转换器：读 DXF 块内坐标、读线段锚点、起名点、抽边弧线、缝份参数、配对校验、Schema 校验；重测每条线段、核对每条边弧长，差 0.05 cm 以上报错）。
+- 新工具：第 6 个 MCP 工具 `dxf_to_apattern` + CLI `pattern apattern`（`--in/--anchors/--quantified/--names/--meta/--out`）。MCP 测试加一项（165-96 v0.2 全套），全套通过。
+- 首个 `.apattern`：`jobs/tshirt-165-96/outputs/v0.2/tshirt-165-96-M.apattern`（4 片、36 个有名点、20 条线段、12 条边、2 条校验全过；边弧长与线段长逐条核对无误）。转换中修了两个 bug：GBK 块名要重解码（前/后/袖/领），多段线段（领围、袖山）要按分段串弧线、不能取首尾最短弧（袖山 50.80 会被错取成底边 46.55）。
+- SKILL.md 升 0.1.3：工具表加 `reanchor_segments` + `dxf_to_apattern`，流程加第 6 步（出 `.apattern`），job 结构图改成每版一个 `.apattern`。job-contract.md 同步改。老版的 quantified.json + segments.md + segments-anchors.json 留着不动，不重写历史。
+- 未推（等用户说“推”）。
+
 ## 2026-11-06 — 清掉 Teagan 残留，write_dxf 夹具换成用户自己的 163 T 恤
 
 - 用户决定：项目里不留 FreeSewing 相关内容。`server/tests/fixtures/teagan-paths-v2.json`（FreeSewing Teagan 款点列）删掉；`write_dxf.py`、`cli.py`、`server.py`、`test_mcp_client.py`、`server/README.md`、SKILL.md、`references/aama-dxf.md` 里所有 "Teagan" 改名——夹具与款名改成用户的 163 T 恤（`tee163-paths.json`，STYLE=Tee163）。

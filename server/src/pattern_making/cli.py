@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""`pattern` command line: quantify | plot | write-dxf | check | serve."""
+"""`pattern` command line: quantify | plot | write-dxf | check | reanchor | apattern | serve."""
 import argparse
 
 from . import __version__
+from . import apattern as apattern_mod
 from . import check as check_mod
 from . import plot as plot_mod
 from . import quantify as quantify_mod
@@ -47,6 +48,15 @@ def build_parser():
     p.add_argument("--tolerance", type=float, default=0.3,
                    help="max anchor-to-# distance in cm (default 0.3)")
 
+    p = sub.add_parser("apattern", help="convert a DXF version to a .apattern file (agent-era pattern format)")
+    p.add_argument("--in", dest="src", required=True)
+    p.add_argument("--anchors", required=True)
+    p.add_argument("--quantified", required=True)
+    p.add_argument("--names", required=True, help="JSON: point names + segment names + piece info")
+    p.add_argument("--meta", required=True, help="JSON: style, size, source, lineage")
+    p.add_argument("--out", required=True)
+    p.add_argument("--block-map", default=None, help="JSON mapping block-name substring -> piece id")
+
     sub.add_parser("serve", help="start the MCP server (stdio)")
     return ap
 
@@ -82,6 +92,13 @@ def main(argv=None):
         if args.out is not None:
             argv2 += ["--out", args.out]
         return reanchor_mod.main(argv2)
+    if args.cmd == "apattern":
+        argv2 = ["--in", args.src, "--anchors", args.anchors,
+                 "--quantified", args.quantified, "--names", args.names,
+                 "--meta", args.meta, "--out", args.out]
+        if args.block_map is not None:
+            argv2 += ["--block-map", args.block_map]
+        return apattern_mod.main(argv2)
     if args.cmd == "serve":
         from .server import main as serve_main
         return serve_main()
