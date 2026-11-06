@@ -2,6 +2,10 @@
 
 按日期记。每次改动先写条目再发版；版本号只写在 SKILL.md 里（frontmatter 的 `version` 字段），发版时按它打 git tag。
 
+## 2026-11-06 — 根 README 补目录架构说明
+
+- 根 `README.md` 的“仓里有什么”改成完整的“目录架构”一节：整棵树 + 分层与边界（仓根 skill / server 工具、引擎与库、框架依赖与库源码、两个运行时一条 JSON 接口、数据文件是生成的、不在仓里的东西）+ 加东西往哪放的对照表。只改文档，不动代码。
+
 ## 2026-11-06 — 通用生成纸样引擎 + 基础纸样库（server/engine/ + server/library/）
 
 - 按用户要求去 Codeberg 把 FreeSewing 的底拿进来，做成本项目的通用生成纸样引擎和基础纸样库，目录架构规范化。先 clone 整个 monorepo（shallow + sparse）核对结构：framework 是 `packages/core`（7.3k 行：Design/Pattern/Point/Path/Store/Stack/SVG 渲染、插件系统）+ `plugins/`；数据结构是 `packages/config` 的 42 个标准量体（只有 shoulderSlope 是角度，其余毫米）+ core 的 pattern settings 默认值；计算公式是各款 `src/*.mjs` 的 draft 函数；款式数据是各款 `about.json` + `i18n/` + `packages/models` 的标准量体套（neckstimate 从颈围推算）。
