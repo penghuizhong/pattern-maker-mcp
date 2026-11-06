@@ -14,10 +14,15 @@ from pathlib import Path
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
-SERVER = "/home/hatch/workspace/your_files/pattern-maker-mcp-repo/server/.venv/bin/pattern"
-TROUSER = "/home/hatch/workspace/jobs/user-dxf-1/1.dxf"
-TROUSER_Q = "/home/hatch/workspace/jobs/user-dxf-1/outputs/v0.1/quantified.json"
-TEAGAN_PATHS = "/home/hatch/workspace/your_files/pattern-maker-mcp-repo/server/tests/fixtures/teagan-paths-v2.json"
+# No hardcoded absolute paths: repo-relative paths come from this file's
+# location; the jobs data root is configurable (env PATTERN_JOBS_ROOT),
+# defaulting to ~/workspace/jobs/ (local default, not a fixed HOME).
+REPO = Path(__file__).resolve().parent.parent  # server/
+SERVER = str(REPO / ".venv" / "bin" / "pattern")
+TEAGAN_PATHS = str(Path(__file__).resolve().parent / "fixtures" / "teagan-paths-v2.json")
+JOBS_ROOT = Path(os.environ.get("PATTERN_JOBS_ROOT", "~/workspace/jobs")).expanduser()
+TROUSER = str(JOBS_ROOT / "user-dxf-1" / "1.dxf")
+TROUSER_Q = str(JOBS_ROOT / "user-dxf-1" / "outputs" / "v0.1" / "quantified.json")
 JOB = "/tmp/job-test"  # rebuilt here each run: /tmp is wiped between sessions
 
 

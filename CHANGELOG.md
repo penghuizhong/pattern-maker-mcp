@@ -2,6 +2,10 @@
 
 按日期记。每次改动先写条目再发版；版本号只写在 SKILL.md 里（frontmatter 的 `version` 字段），发版时按它打 git tag。
 
+## 2026-11-06 — 测试去掉硬编码路径（jobs 根目录可配置）
+
+- `server/tests/test_mcp_client.py` 的 4 个绝对路径全去掉：`SERVER` 与 `teagan-paths-v2.json` 夹具改从测试文件自身位置推导（`Path(__file__)`，跟仓走）；裤子 DXF 与 quantified.json 改从 jobs 根目录推导，根目录可配（环境变量 `PATTERN_JOBS_ROOT`），默认 `~/workspace/jobs/`（只是本地默认值，不是写死的 HOME）。默认与显式设 `PATTERN_JOBS_ROOT=~/workspace/jobs` 两种跑法 MCP 全套测试都通过。只改测试，不升版本。
+
 ## 2026-11-06 — job 文件夹统一到 ~/workspace/jobs/ + 删 freesewing-teagan-test
 
 - 所有量化的 job 文件夹统一到 `~/workspace/jobs/`（新顶层目录，通用型，Muse 和本地 OpenClaw 同一套结构）：`user-dxf-1`（裤子）、`tshirt-template`（163 T 恤）、`tshirt-pattern-v1`…`v3`、`brian-block-test` 从 `goals/.../files/` 搬过去；`your_files/` 里留同名软链指向新位置，方便找。job-contract.md 钉死根目录为 `~/workspace/jobs/`，SKILL.md 的路径同步改。
