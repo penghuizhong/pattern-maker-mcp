@@ -78,15 +78,22 @@ def quantify_dxf(dxf_path: str, out_json: str, by_block: bool = False,
 
 
 @mcp.tool
-def plot_numbered_dxf(dxf_path: str, out_png: str, title: str | None = None) -> dict:
+def plot_numbered_dxf(dxf_path: str, out_png: str, title: str | None = None,
+                      compact: bool = True) -> dict:
     """Draw a numbered verification plot (PNG) from a DXF pattern.
 
-    All pieces at modelspace positions; layer 2 turn points get black #
-    labels, layer 4 notch points red # labels. Units in the figure are cm
-    (file mm / 10). Closed polylines are drawn with their closing segment.
-    Returns piece names with label counts and the output path.
+    compact=True (default) packs the pieces into a tight grid (2 columns,
+    5 cm gap) instead of the DXF's own INSERT positions, which are the
+    CAD's marker layout and are usually far apart; within a row the
+    pieces are aligned by their local bbox bottom, so front/back chest
+    lines land on the same y. compact=False reproduces the DXF INSERT
+    positions faithfully. All pieces at modelspace positions; layer 2
+    turn points get black # labels, layer 4 notch points red # labels.
+    Units in the figure are cm (file mm / 10). Closed polylines are
+    drawn with their closing segment. Returns piece names with label
+    counts and the output path.
     """
-    return plot_mod.plot(dxf_path, out_png, title)
+    return plot_mod.plot(dxf_path, out_png, title, compact=compact)
 
 
 @mcp.tool

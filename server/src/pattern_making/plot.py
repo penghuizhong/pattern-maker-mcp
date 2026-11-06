@@ -3,8 +3,18 @@
 positions, all # labels coloured by the geometry they belong to. Data plot
 from the DXF itself (ezdxf + matplotlib), not generative imagery.
 
-Library: plot(src, out, title=None) -> {"pieces", "total_labels", "out"}.
-CLI: `pattern plot --in source.dxf --out numbered.png [--title "标题"]`
+Library: plot(src, out, title=None, compact=True) -> {"pieces", "total_labels", "out"}.
+CLI: `pattern plot --in source.dxf --out numbered.png [--title "标题"] [--no-compact]`
+
+Layout: compact=True (default) packs the pieces into a tight grid
+(2 columns, 5 cm gap) instead of using the DXF's own INSERT positions,
+which are the CAD's marker layout and are usually far apart (v0.3:
+~175x184 cm apart vs ~110x99 cm compact). Within a row the pieces are
+aligned by their local bounding-box bottom, so pieces that share a
+common block origin (front/back of one garment) have their
+corresponding features aligned -- e.g. the front and back chest lines
+(armpit level) land on the same y. compact=False reproduces the DXF
+INSERT positions faithfully.
 
 Layer colours: 1 cut line black, 14 net line orange dashed,
 7 grainline blue dashed, 8 internal lines grey. Units in the figure are cm
@@ -41,6 +51,52 @@ from matplotlib.lines import Line2D
 CJK_PATH = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
 # macOS CJK fonts, tried when the Linux path above does not exist.
 CJK_FAMILIES = ["PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Songti SC"]
+
+# Compact layout: grid columns and gap (cm) between pieces / rows.
+COMPACT_COLS = 2
+COMPACT_GAP = 5.0
+
+
+def _piece_local_bbox(doc, ins):
+    """Local bounding box of one INSERT's block, in cm, before any offset.
+
+    From the block's POLYLINE vertices (layers 1/14/8, the piece outline);
+    LINE entities (grainline / internal) never extend past the outline.
+    Returns (min_x, min_y, max_x, max_y)."""
+    blk = doc.blocks[ins.dxf.name]
+    xs, ys = [], []
+    for e in blk:
+        if e.dxftype() == "POLYLINE" and str(e.dxf.layer) in ("1", "14", "8"):
+            for v in e.vertices:
+                xs.append(v.dxf.location.x / 10.0)
+                ys.append(v.dxf.location.y / 10.0)
+    return (min(xs), min(ys), max(xs), max(ys))
+
+
+def _compact_offsets(bboxes):
+    """Grid offsets (cm) packing the pieces tightly, in INSERT order.
+
+    Rows of COMPACT_COLS, COMPACT_GAP between pieces and rows. Within a
+    row the pieces are aligned by their local bbox bottom, so pieces
+    that share a common block origin (front/back of one garment) have
+    their corresponding features aligned -- e.g. both chest lines
+    (armpit level) land on the same y. First row at the top.
+    Returns a list of (ox, oy) offsets to add to local coordinates."""
+    cols = COMPACT_COLS
+    gap = COMPACT_GAP
+    rows = [bboxes[i:i + cols] for i in range(0, len(bboxes), cols)]
+    row_h = [max(bb[3] - bb[1] for bb in row) for row in rows]
+    total_h = sum(row_h) + gap * (len(rows) - 1)
+    offsets = []
+    y_cursor = total_h  # top of the first row
+    for row, rh in zip(rows, row_h):
+        baseline = y_cursor - rh  # local bbox bottom of this row
+        x_cursor = 0.0
+        for bb in row:
+            offsets.append((x_cursor - bb[0], baseline - bb[1]))
+            x_cursor += (bb[2] - bb[0]) + gap
+        y_cursor = baseline - gap
+    return offsets
 
 
 def cjk_font():
@@ -171,7 +227,7 @@ def draw_labels(ax, labels):
                 fontweight="bold" if bold else "normal")
 
 
-def plot(src, out, title=None):
+def plot(src, out, title=None, compact=True):
     """Draw the numbered verification plot. Returns a summary dict."""
     src = Path(src)
     title = title if title is not None else f"{src.stem} — 编号图"
@@ -180,18 +236,23 @@ def plot(src, out, title=None):
     doc = ezdxf.readfile(src)
     ms = doc.modelspace()
 
+    inserts = [ins for ins in ms if ins.dxftype() == "INSERT"]
+    if compact:
+        # Tight grid (see _compact_offsets); else the DXF's own INSERTs.
+        offsets = _compact_offsets([_piece_local_bbox(doc, ins) for ins in inserts])
+    else:
+        offsets = [(ins.dxf.insert[0] / 10.0, ins.dxf.insert[1] / 10.0)
+                   for ins in inserts]
+
     pieces = []
-    for ins in ms:
-        if ins.dxftype() != "INSERT":
-            continue
+    for ins, (ox, oy) in zip(inserts, offsets):
         blk = doc.blocks[ins.dxf.name]
-        ox, oy, _ = ins.dxf.insert
         xs, ys = ins.dxf.xscale, ins.dxf.yscale
         rot = ins.dxf.rotation
         assert xs == 1.0 and ys == 1.0 and rot == 0.0, (ins.dxf.name, xs, ys, rot)
 
         def T(p):
-            return ((p[0] + ox) / 10.0, (p[1] + oy) / 10.0)
+            return (p[0] / 10.0 + ox, p[1] / 10.0 + oy)
 
         data = {"name": piece_name(ins.dxf.name), "l1": [], "l14": [], "l7": [], "l8": [],
                 "pts": [], "texts": [], "vmap": {}}
@@ -305,6 +366,7 @@ def plot(src, out, title=None):
         "pieces": [{"name": p["name"], "turn_labels": p["n_labels"]}
                    for p in pieces],
         "total_labels": total_labels,
+        "layout": "compact" if compact else "dxf",
         "out": str(out),
     }
 
@@ -314,10 +376,15 @@ def main(argv=None):
     ap.add_argument("--in", dest="src", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--title", default=None)
+    ap.add_argument("--compact", dest="compact", action="store_true", default=True,
+                    help="pack pieces into a tight grid (default)")
+    ap.add_argument("--no-compact", dest="compact", action="store_false",
+                    help="use the DXF's own INSERT positions instead")
     args = ap.parse_args(argv)
-    result = plot(args.src, args.out, args.title)
+    result = plot(args.src, args.out, args.title, compact=args.compact)
     print("pieces:", [(p["name"], p["turn_labels"]) for p in result["pieces"]])
     print("total labels:", result["total_labels"])
+    print("layout:", result["layout"])
     print("saved", args.out)
     return 0
 

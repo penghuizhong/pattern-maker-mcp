@@ -30,6 +30,10 @@ def build_parser():
     p.add_argument("--in", dest="src", required=True)
     p.add_argument("--out", required=True)
     p.add_argument("--title", default=None)
+    p.add_argument("--compact", dest="compact", action="store_true", default=True,
+                   help="pack pieces into a tight grid (default)")
+    p.add_argument("--no-compact", dest="compact", action="store_false",
+                   help="use the DXF's own INSERT positions instead")
 
     p = sub.add_parser("write-dxf", help="write a DXF-AAMA file (R12) from JSON paths")
     p.add_argument("--input", default="tee163-paths.json")
@@ -76,6 +80,8 @@ def main(argv=None):
         argv2 = ["--in", args.src, "--out", args.out]
         if args.title is not None:
             argv2 += ["--title", args.title]
+        if not args.compact:
+            argv2.append("--no-compact")
         return plot_mod.main(argv2)
     if args.cmd == "write-dxf":
         argv2 = ["--input", args.input, "--output", args.output]
