@@ -1,7 +1,7 @@
 ---
 name: pattern-making
 version: 0.1.2
-description: Garment pattern work driven by an agent. Use when the user asks for a sewing pattern, a toile/sample pattern, grading, a DXF for a factory, or a pattern check. Turns a user requirement into a versioned pattern job: requirement sheet first, measurements from the locked size tables, deterministic geometry by script/engine (never coordinates computed in the agent's head), a validation gate, and a human approval gate before any factory release or sample cut.
+description: "Garment pattern work driven by an agent. Use when the user asks for a sewing pattern, a toile/sample pattern, grading, a DXF for a factory, or a pattern check. Turns a user requirement into a versioned pattern job: requirement sheet first, measurements from the locked size tables, deterministic geometry by script/engine (never coordinates computed in the agent's head), a validation gate, and a human approval gate before any factory release or sample cut."
 ---
 
 # Pattern Making (skill, v0.1.2)
