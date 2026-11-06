@@ -7,6 +7,10 @@
 - 标题去掉版本号；版本号只剩 frontmatter 的 `version` 字段（README 版本管理一节同步改了）。
 - 删掉所有硬编码的款形字眼（西装、T 恤、男女装）：流程只讲通用步骤，款式只出现在 job 数据和 `measurements/` 表里，不出现在 skill 正文里。
 - `协议红线` 整节删除；`参考文件` 一节删除，两个只在那里出现的引用改到步骤里内联（出图 → curves.md，校验门 → validation-gate.md）。
+- scripts/ 只留 check_job.py、dxf_quantify.py、to-dxf-v3.py：tshirt.py、grading.py 已删；第 2 步放码改按 grading.md 恒量自检，不再跑脚本。
+- job-contract.md 补 approval.md 模板格式（日期、版本、放行范围、已知风险；对齐 check_job.py --release 的四点检查）。
+- references/ 只留 aama-dxf.md、job-contract.md、validation-gate.md：curves.md、engines.md、grading.md、measurements.md 已删；SKILL.md 第 2、3 步的引用同步改成直接表述（按表验算恒量、曲线纪律一行）。
+- 再重构：SKILL.md 改写成两条通用流程（FreeSewing 生成、DXF 复刻）；Python/GarmentCode 生成路线删掉（没跑通过的链路）；pattern.py 悬空引用随之消除。
 
 ## 2026-11-05（晚上）—— 缝份角改尖角
 

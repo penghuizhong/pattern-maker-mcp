@@ -5,9 +5,9 @@
 ## 仓里有什么
 
 - `SKILL.md` — 触发条件、铁律、工作流
-- `references/` — 尺寸表出处、放码规则、job 契约、校验门、引擎对照、曲线纪律
+- `references/` — DXF-AAMA 规范、job 契约、校验门
 - `measurements/` — 男女西装成衣尺寸表的机器版（JSON）
-- `scripts/` — 放码、校验、T 恤生成、DXF 量化（Python 标准库为主）
+- `scripts/` — 校验、DXF 量化（Python 标准库为主）
 - `examples/womens-suit-M/` — 能跑通的示例 job：证明围度 + 放码 + 校验门，**不是纸样**
 
 ## 使用
@@ -17,8 +17,6 @@
 ## 快速验证
 
 ```bash
-python3 scripts/grading.py --garment mens-suit
-python3 scripts/grading.py --garment womens-suit
 python3 scripts/check_job.py --job examples/womens-suit-M
 # 下面这条必须失败（没有 approval.md、还有 OPEN 项），失败就是门在工作：
 python3 scripts/check_job.py --job examples/womens-suit-M --release

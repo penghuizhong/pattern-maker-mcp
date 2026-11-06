@@ -13,7 +13,7 @@ python3 scripts/check_job.py --job jobs/<款号> --release
 2. `measurements.json` 引用的表在 `measurements/` 里存在，码段在表里齐全；
 3. `design.json` 的 `open_items` 和 `requirements.md` 的 OPEN 项一致（不能一边写 OPEN、一边当定稿）；
 4. 本版 `outputs/<版本>/` 存在，`verification.json` 存在；
-5. 放码恒量自检通过（由 `grading.py` 的结果或 verification.json 里的记录证明）。
+5. 放码恒量自检通过（由 verification.json 里的记录证明）。
 
 ## 机器门：几何校验（有产物时必做）
 
