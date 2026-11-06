@@ -27,6 +27,7 @@ from fastmcp import FastMCP
 
 from . import apattern as apattern_mod
 from . import check as check_mod
+from . import draft as draft_mod
 from . import plot as plot_mod
 from . import quantify as quantify_mod
 from . import reanchor as reanchor_mod
@@ -156,6 +157,37 @@ def dxf_to_apattern(dxf_path: str, anchors_path: str, quantified_path: str,
             "points": sum(len(p["points"]) for p in data["pieces"].values()),
             "segments": sum(len(p.get("segments", {})) for p in data["pieces"].values()),
             "edges": sum(len(p.get("edges", {})) for p in data["pieces"].values()),
+            "checks": data.get("checks", [])}
+
+
+@mcp.tool
+def draft_pattern(base_apattern: str, measurements_json: str,
+                 options_json: str = "{}", out_path: str = "") -> dict:
+    """Draft a new size from a quantified base pattern (.apattern).
+
+    Parametric drafting, not grading and not scaling: the target
+    garment measurements are computed from body measurements +
+    options (fit/ease, sleeve, neckline), the base pattern's named
+    points are moved to hit those targets, the outline is rebuilt
+    by interpolation, the sleeve cap is re-derived to match the new
+    armhole and the collar to match the new neckline, then every
+    segment is re-measured and the pairing checks re-run. Any failed
+    check raises an error instead of writing wrong data.
+    measurements_json: {"chest": body cm, "height": cm,
+    "size_label": "L", ...}; options_json: {"fit": "regular"|"slim"|
+    "loose", "sleeve": "short"|"long", "neckline": "crew"|"vneck"}.
+    Returns the new .apattern summary with its checks.
+    """
+    measurements = json.loads(measurements_json)
+    options = json.loads(options_json) if options_json else {}
+    data = draft_mod.draft(base_apattern, measurements, options, out_path)
+    errors = apattern_mod.validate_apattern(data)
+    if errors:
+        raise ValueError("apattern schema errors: " + "; ".join(errors))
+    return {"out": out_path, "style": data["style"], "size": data["size"],
+            "pieces": len(data["pieces"]),
+            "segments": {pid: {k: v["length"] for k, v in p["segments"].items()}
+                         for pid, p in data["pieces"].items()},
             "checks": data.get("checks", [])}
 
 

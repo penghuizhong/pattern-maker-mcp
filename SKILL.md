@@ -1,6 +1,6 @@
 ---
 name: pattern-making
-version: 0.1.4
+version: 0.1.5
 description: "Garment pattern work: replicate and quantify a pattern from the user's own DXF. Parameters only, never coordinates computed in the agent's head; every version a new directory; a validation gate and a human approval gate before release."
 ---
 
@@ -17,6 +17,7 @@ description: "Garment pattern work: replicate and quantify a pattern from the us
 | `write_dxf_aama` | `pattern write-dxf` | JSON 点列 → DXF-AAMA |
 | `reanchor_segments` | `pattern reanchor` | 锚点 → 新版 DXF 的线段重量 |
 | `dxf_to_apattern` | `pattern apattern` | DXF + 线段 → `.apattern`（agent 时代纸样文件） |
+| `draft_pattern` | `pattern draft` | 量体 + 选项 → 新码 `.apattern`（参数制版） |
 | `check_job` | `pattern check` | 校验门（`--release` 多一道放行门） |
 
 ## 铁律
@@ -52,6 +53,35 @@ description: "Garment pattern work: replicate and quantify a pattern from the us
 6. **出 `.apattern`。** 每版定稿后，用 `dxf_to_apattern` 工具（CLI：`pattern apattern --in source.dxf --anchors segments-anchors.json --quantified quantified.json --names names.json --meta meta.json --out <款号>-<码>.apattern`）把本版转成 `.apattern`——agent 时代的纸样文件（JSON，一个款、一个码、一个文件；有名有姓的点/边/线段，顶替不稳定的 DXF # 号；缝份是参数；配对校验是数据）。格式标准见 `references/apattern-schema.json`，说明见 `references/apattern.md`。点名是人定的（哪个 # 是腋点、哪个是领口中点），`names.json` 里写清楚，工具不编名字。转换器会重测每条线段、核对每条边的弧长和线段长，差 0.05 cm 以上就报错，不悄悄写错数据。转完的 `.apattern` 是本版纸样数据的唯一源头，进当版目录；`quantified.json`、`segments.md`、`segments-anchors.json` 不再另存（老版的留着不动，不重写历史）。
 7. **存档。** `.apattern` + 编号图进当版目录，校验结果进 `verification.json`。
 8. **下一步（另议，不自动做）。** 缝份配对（用户定配对表，agent 按表量）、放码（= 按量体重打版，不是缩放图纸；单码文件放不出多码，要用户给放码表或各码围度）、用户自家公式提取（按公式提取表的方法，实测值做锚，用户填公式、agent 验算；不编公式）、`.apattern` → DXF-AAMA 导出（生产用，目前还走原 DXF）。
+
+## 流程：出纸样（自然语言 → 参数制版）
+
+用户说一句话要纸样（“帮我出一个 T 恤纸样”），agent 问清关键信息再出图，不是放码、不是缩放，是按量体重新打版。
+
+**需求模型**在 `requirements/<款式>.json` 里：量体（人：胸围、身高，必填；肩宽、腰围，选填）+ 选项（衣服：版型/领型/袖长/衣长，各有默认值）。agent 先读需求模型，再对照用户给的信息，缺什么问什么。
+
+**追问的规矩：**
+- 先问量体（胸围、身高），再问选项（版型、领型、袖长）；一次问一个主题，不一次甩十个问题。
+- 每个问题都带底版参照和默认值（“165-96 是人体 96、成衣 102 的常规版，你要多大？”），用户只说“就按常规”就能过。
+- 头脑风暴式：agent 提方案、用户拍板，不是填表。用户改主意随时可以改，改完重算。
+- 必填项（胸围、身高）没齐不能出图；选填项没给就用默认值，出图时写清楚用了哪个默认。
+
+**制版引擎**（`draft_pattern` 工具，CLI：`pattern draft --base <底版.apattern> --measurements '{...}' --options '{...}' --out <新码.apattern>`）：
+- 成衣量度 = 量体 + 松量（版型定松量：修身胸围 +4、常规 +6、宽松 +10）；前/后片按底版比例分（165-96 前 49、后 53）。
+- **用户的制版规则（2026-11-07，一码 = 成衣胸围 4 cm，全部按胸围放量 chest_delta 走）：**
+  - 肩宽：一码 +1 cm（chest_delta/4）。肩线（领肩点→肩端点）加长这个数，**斜度不变**：肩端点从新领肩点沿底版肩线方向放。
+  - 后背宽 / 前胸宽：各 +胸围放量 × 15%（back_w / chest_w 点左右各移一半）。
+  - 袖笼深：+胸围放量 × 20%（腋点往下移，袖笼加深）。
+  - 后领宽 / 前领宽：各 +胸围放量 × 10%（领肩点左右各移一半）。
+  - 后领深：**固定**（底版值不变，后领围中点跟着领肩点走）。
+  - 前领深：+胸围放量 × 10%（前领围中点往下移）。
+  - 袖肥：+胸围放量 / 2（袖片 cap_l / cap_r 左右各移一半）。
+  - 袖山高：动态调整以对合袖笼线长（袖山 = 前袖笼 + 后袖笼 + 0.05，针织无容量），一般往上抬 0.2–0.35。
+  - 袖口：跟袖肥一样放（+胸围放量 / 2）。
+- 袖笼、领围是结果不是输入：宽度/长度动完重测；袖山按新袖笼反推，领长按新领围反推（领长 =（前领围 + 后领围）× 0.82，罗纹负松量）。
+- 轮廓按有名点插值重建（曲线保形）；全部线段重测、配对校验重跑，不过就报错停下，不悄悄改数字。
+- 规则全文写在 `server/src/pattern_making/draft.py` 的文件头里，等用户纠正。
+- 出图后把关键量度（成衣胸围、腰围、摆围、衣长、袖笼、袖山、领围）和编号图一起给用户确认；用户点头才算完。
 
 ## 出 DXF（可选）
 

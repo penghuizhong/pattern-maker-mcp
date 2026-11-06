@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""`pattern` command line: quantify | plot | write-dxf | check | reanchor | apattern | serve."""
+"""`pattern` command line: quantify | plot | write-dxf | check | reanchor | apattern | draft | serve."""
 import argparse
 
 from . import __version__
 from . import apattern as apattern_mod
 from . import check as check_mod
+from . import draft as draft_mod
 from . import plot as plot_mod
 from . import quantify as quantify_mod
 from . import reanchor as reanchor_mod
@@ -61,6 +62,12 @@ def build_parser():
     p.add_argument("--out", required=True)
     p.add_argument("--block-map", default=None, help="JSON mapping block-name substring -> piece id")
 
+    p = sub.add_parser("draft", help="draft a new size from a base .apattern (parametric, measurements -> pattern)")
+    p.add_argument("--base", required=True, help="base .apattern")
+    p.add_argument("--measurements", required=True, help='JSON: {"chest": body cm, "height": cm, "size_label": "L", ...}')
+    p.add_argument("--options", default="{}", help='JSON: {"fit": "regular"|"slim"|"loose", "sleeve": "short"|"long"}')
+    p.add_argument("--out", required=True)
+
     sub.add_parser("serve", help="start the MCP server (stdio)")
     return ap
 
@@ -105,6 +112,10 @@ def main(argv=None):
         if args.block_map is not None:
             argv2 += ["--block-map", args.block_map]
         return apattern_mod.main(argv2)
+    if args.cmd == "draft":
+        argv2 = ["--base", args.base, "--measurements", args.measurements,
+                 "--options", args.options, "--out", args.out]
+        return draft_mod.main(argv2)
     if args.cmd == "serve":
         from .server import main as serve_main
         return serve_main()

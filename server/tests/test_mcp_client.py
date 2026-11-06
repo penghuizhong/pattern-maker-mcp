@@ -59,7 +59,8 @@ async def main():
             names = [t.name for t in tools.tools]
             print("tools:", names)
             assert names == ["quantify_dxf", "plot_numbered_dxf", "write_dxf_aama",
-                             "reanchor_segments", "dxf_to_apattern", "check_job"], names
+                             "reanchor_segments", "dxf_to_apattern", "draft_pattern",
+                             "check_job"], names
             for t in tools.tools:
                 print(f"  {t.name}: {json.dumps(t.input_schema.get('properties', {}), ensure_ascii=False)[:220]}")
 
@@ -168,6 +169,29 @@ async def main():
                 print("apattern checks all pass")
             else:
                 print("apattern skipped: tshirt-165-96 v0.2 job not present")
+
+            # 3d. draft: 165-96 v0.3 M -> L (body chest 100, height 170,
+            # regular fit). Garment chest must be 106 (100+6), split
+            # front/back by the base ratio; centre length 63.84
+            # (62.84 + 1 per +5 cm height); both pairing checks pass.
+            v03 = JOBS_ROOT / "tshirt-165-96" / "outputs" / "v0.3"
+            if (v03 / "tshirt-165-96-M.apattern").exists():
+                r = tool_json(await session.call_tool("draft_pattern", {
+                    "base_apattern": str(v03 / "tshirt-165-96-M.apattern"),
+                    "measurements_json": json.dumps(
+                        {"chest": 100, "height": 170, "size_label": "L"}),
+                    "options_json": json.dumps({"fit": "regular", "sleeve": "short"}),
+                    "out_path": "/tmp/mcp-tshirt-165-96-L.apattern"}))
+                print("draft:", r["style"], r["size"],
+                      "| checks:", [(c["rule"][:20], c["pass"]) for c in r["checks"]])
+                segs = r["segments"]
+                assert abs(segs["front"]["chest"] + segs["back"]["chest"] - 106.0) < 0.05, segs
+                assert abs(segs["back"]["center_length"] - 63.84) < 0.05, segs
+                assert abs(segs["front"]["armhole_l"] - segs["front"]["armhole_r"]) < 0.05, segs
+                assert all(c["pass"] for c in r["checks"]), r["checks"]
+                print("draft checks all pass")
+            else:
+                print("draft skipped: tshirt-165-96 v0.3 .apattern not present")
 
             # 4a. check normal + release (job has approval.md)
             r = tool_json(await session.call_tool("check_job", {"job_dir": JOB}))
