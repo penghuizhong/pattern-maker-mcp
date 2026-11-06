@@ -1,9 +1,13 @@
 # Job contract — 一个款一个文件夹
 
+## 根目录（固定）
+
+所有 job 文件夹都在 `~/workspace/jobs/` 下面，一个款一个文件夹。Muse 和本地 OpenClaw 用同一套结构、同一个根目录（两台机器看到同一份文件靠同步办法，结构本身不变）。
+
 ## 结构（固定，不许自创变体）
 
 ```
-jobs/<款号>/
+~/workspace/jobs/<款号>/
   requirements.md      # 用户原话 + 结构单 + OPEN 项（必须先有）
   measurements.json    # 围度：用户给的量体数据或多码表（必须标来源）
   design.json          # 款式参数（见下）
@@ -12,6 +16,8 @@ jobs/<款号>/
   verification.json    # 本版校验结果（机器门）
   approval.md          # 用户审批记录（人门，放行前必须有）
 ```
+
+复刻链多一个原文件在 job 根目录：`source.dxf`（用户发的原文件，不动；老 job 里原名保留，如 `1.dxf`、`tshirt.dxf`）。
 
 ## design.json 字段（最小集）
 

@@ -15,9 +15,9 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 SERVER = "/home/hatch/workspace/your_files/pattern-maker-mcp-repo/server/.venv/bin/pattern"
-TROUSER = "/home/hatch/workspace/your_files/user-dxf-1/1.dxf"
-TROUSER_Q = "/home/hatch/workspace/your_files/user-dxf-1/quantified.json"
-TEAGAN_PATHS = "/home/hatch/workspace/your_files/freesewing-teagan-test/teagan-paths-v2.json"
+TROUSER = "/home/hatch/workspace/jobs/user-dxf-1/1.dxf"
+TROUSER_Q = "/home/hatch/workspace/jobs/user-dxf-1/outputs/v0.1/quantified.json"
+TEAGAN_PATHS = "/home/hatch/workspace/your_files/pattern-maker-mcp-repo/server/tests/fixtures/teagan-paths-v2.json"
 JOB = "/tmp/job-test"  # rebuilt here each run: /tmp is wiped between sessions
 
 

@@ -2,6 +2,12 @@
 
 按日期记。每次改动先写条目再发版；版本号只写在 SKILL.md 里（frontmatter 的 `version` 字段），发版时按它打 git tag。
 
+## 2026-11-06 — job 文件夹统一到 ~/workspace/jobs/ + 删 freesewing-teagan-test
+
+- 所有量化的 job 文件夹统一到 `~/workspace/jobs/`（新顶层目录，通用型，Muse 和本地 OpenClaw 同一套结构）：`user-dxf-1`（裤子）、`tshirt-template`（163 T 恤）、`tshirt-pattern-v1`…`v3`、`brian-block-test` 从 `goals/.../files/` 搬过去；`your_files/` 里留同名软链指向新位置，方便找。job-contract.md 钉死根目录为 `~/workspace/jobs/`，SKILL.md 的路径同步改。
+- 每 job 按 job-contract 整理：源 DXF 留根目录（老 job 原名保留，如 `1.dxf`、`tshirt.dxf`，新 job 用 `source.dxf`）；量化 JSON、编号图、ANALYSIS.md、SVG/PNG 收进 `outputs/v0.1/`；缺的 `requirements.md` 按已知事实补上（裤子、T 恤模板、v1–v3 各一份）。brian-block-test 本来就是标准结构，直接搬。
+- `freesewing-teagan-test` 删掉（用户决定：项目跟 FreeSewing 已完全无关）。测试用的 `teagan-paths-v2.json` 收进仓里做夹具：`server/tests/fixtures/teagan-paths-v2.json`，测试改指这个路径；裤子测试路径改指 `jobs/user-dxf-1/`（DXF 在根目录，quantified.json 在 `outputs/v0.1/`）。MCP 全套测试重跑通过。
+
 ## 2026-11-06 — 删掉 FreeSewing
 
 - 用户决定：DXF 处理流程（收文件、量化、画编号图、量弧线、拟合贝塞尔、写分析）全是 Python + ezdxf，一行 FreeSewing 没用到；FreeSewing 的量体跟用户的不合，生成链不用它。删干净，不留旧新并存。

@@ -28,10 +28,10 @@ description: "Garment pattern work: replicate and quantify a pattern from the us
 
 用户在自己的 CAD 里手打版、导出 DXF；agent 只量、不画、不改、不编。
 
-一个款一个 job 文件夹：
+一个款一个 job 文件夹（根目录 `~/workspace/jobs/`，见 `references/job-contract.md`）：
 
 ```
-jobs/<款号>/
+~/workspace/jobs/<款号>/
   requirements.md      # 文件来源、款名、样码、制版软件
   source.dxf           # 用户发的原文件，不动
   outputs/v0.1/        # 本版产物：量化 JSON、重画图、编号图
@@ -53,7 +53,7 @@ jobs/<款号>/
 
 ## 校验
 
-调 `check_job` 工具（CLI：`pattern check --job jobs/<款号>`；放行检查加 `--release`）。
+调 `check_job` 工具（CLI：`pattern check --job ~/workspace/jobs/<款号>`；放行检查加 `--release`）。
 
 `--release` 要求同时满足：`verification.json` 状态为 pass、`approval.md` 里有用户明确的放行记录、本版输出目录存在且未被后续覆盖。缺任何一项，脚本退出非 0，agent 必须停下来找用户，不能自己放行。细则见 `references/validation-gate.md`。
 
