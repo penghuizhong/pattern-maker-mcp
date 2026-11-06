@@ -4,7 +4,7 @@
 
 ## 仓里有什么
 
-- `SKILL.md` — 触发条件、铁律、工作流、协议红线
+- `SKILL.md` — 触发条件、铁律、工作流
 - `references/` — 尺寸表出处、放码规则、job 契约、校验门、引擎对照、曲线纪律
 - `measurements/` — 男女西装成衣尺寸表的机器版（JSON）
 - `scripts/` — 放码、校验、T 恤生成、DXF 量化（Python 标准库为主）
@@ -26,7 +26,7 @@ python3 scripts/check_job.py --job examples/womens-suit-M --release
 
 ## 版本管理
 
-- 版本号只写在 `SKILL.md` 里（frontmatter 的 `version` 字段，标题与它保持一致），其他文件不写版本号，防不同步。
+- 版本号只写在 `SKILL.md` 的 frontmatter `version` 字段里，其他文件不写版本号，防不同步。
 - 每次改动先在 `CHANGELOG.md` 里写条目（按日期记）再发版。
 - 发版时在 git 里按 `SKILL.md` 的 version 打 tag，tag 随分支一起推。
 
