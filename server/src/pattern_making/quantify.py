@@ -6,6 +6,13 @@ The agent never invents coordinates: every number in the output is measured
 from entities actually present in the file. Entities the reader cannot
 measure are listed under `unsupported`, never silently dropped.
 
+Numbered (# N) points: in by-block (AAMA) mode each piece also carries
+`numbered_points`, mapping each "# N" label to the POINT entity it names
+(`xy_mm` in the same modelspace coordinates as outline_points, `layer`,
+and `text_offset_mm` = distance from the label to the point). This folds
+the old second pass (re-reading the DXF just to locate each # point) into
+quantify itself.
+
 Supported: LWPOLYLINE, POLYLINE, LINE, ARC, CIRCLE, SPLINE (flattened),
 TEXT, MTEXT. INSERT (block references) are counted but not expanded.
 
@@ -143,7 +150,20 @@ def quantify_by_block(doc, factor, use_gbk):
                 return (ix + (px * sx * ca - py * sy * sa) * factor,
                         iy + (px * sx * sa + py * sy * ca) * factor)
 
-            piece = pieces.setdefault(bname, {"layers": {}, "texts": [], "point_count": 0})
+            piece = pieces.setdefault(bname, {"layers": {}, "texts": [], "point_count": 0,
+                                            "numbered_points": {}})
+            # Pre-collect POINT entities (transformed to modelspace) so that
+            # numbered (# N) TEXT labels can be matched to the point they name.
+            # quantify used to record only the label strings (texts) and a point
+            # count -- the coordinates were lost, forcing a second pass over the
+            # DXF to locate each # point. Now they are captured here, in the
+            # same modelspace coordinates as outline_points.
+            block_points = []
+            for be in block:
+                if be.dxftype() == "POINT":
+                    lx, ly = float(be.dxf.location.x), float(be.dxf.location.y)
+                    tx, ty = xf(lx, ly)
+                    block_points.append((tx, ty, str(be.dxf.layer)))
             for be in block:
                 bt = be.dxftype()
                 if bt == "POINT":
@@ -159,6 +179,22 @@ def quantify_by_block(doc, factor, use_gbk):
                     t = decode_gbk(text) if use_gbk else text
                     if t:
                         piece["texts"].append(t)
+                        if t.strip().startswith("#") and block_points:
+                            tx, ty = pts[0]
+                            # The label names a POINT on the same layer (AAMA:
+                            # layer 2 = corner points, layer 4 = notch points).
+                            # Match same-layer first so a dense layer-3 curve
+                            # point sitting on the same spot is not picked up.
+                            tlayer = str(be.dxf.layer)
+                            same = [p for p in block_points if p[2] == tlayer]
+                            pool = same if same else block_points
+                            bx, by, blayer = min(
+                                pool, key=lambda p: (p[0] - tx) ** 2 + (p[1] - ty) ** 2)
+                            piece["numbered_points"][t.strip()] = {
+                                "xy_mm": [round(bx, 1), round(by, 1)],
+                                "layer": blayer,
+                                "text_offset_mm": round(dist((tx, ty), (bx, by)), 1),
+                            }
                 elif kind == "polyline":
                     m = poly_metrics(pts, closed)
                     m["outline_points"] = [[round(x, 1), round(y, 1)] for x, y in pts]
@@ -273,7 +309,8 @@ def _print_summary(result, out):
                 for m in ms:
                     print(f"   layer {layer}: perimeter {m['perimeter_mm']} mm, bbox {m['bbox_mm']['width']} x {m['bbox_mm']['height']} mm"
                           + (f", area {m['area_mm2']} mm2" if m["area_mm2"] else "") + f", closed={m['closed']}")
-            print(f"   texts: {p['texts'][:8]}  point_count: {p['point_count']}")
+            print(f"   texts: {p['texts'][:8]}  point_count: {p['point_count']}"
+                  + (f"  numbered: {len(p.get('numbered_points', {}))}" if p.get('numbered_points') is not None else ""))
     else:
         pieces = result["pieces"]
         print(f"pieces: {sorted(pieces)}")

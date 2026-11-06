@@ -1,6 +1,6 @@
-"""pattern-making: DXF quantify/plot/write (AAMA) + job validation gate + FreeSewing draft.
+"""pattern-making: DXF quantify/plot/write (AAMA) + job validation gate.
 
-CLI: `pattern quantify|plot|write-dxf|check|draft|serve`
+CLI: `pattern quantify|plot|write-dxf|check|serve`
 MCP server: `pattern serve` (stdio) or `python -m pattern_making.server`
 """
 

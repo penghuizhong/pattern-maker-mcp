@@ -1,6 +1,6 @@
 """AAMA-normalized DXF writer (v3).
 
-Reads FreeSewing native paths dumped as JSON (dump-json-v2.mjs format:
+Reads pattern paths dumped as JSON (format:
 {stack: {paths: {seam, sa, grainline?}, notches: [{name, def, x, y}], title}})
 and writes a standard DXF-AAMA file (R12 / AC1009):
 
@@ -33,19 +33,19 @@ Closed polylines carry BOTH the closed flag AND an explicit closing
 vertex (first point repeated at the end), the iwase-dialect storage that
 survives read-back best (2026-11-05 dialect study).
 
-SA corners: FreeSewing's SA offset joins sharp corners with a bevel (a
+SA corners: the SA offset joins sharp corners with a bevel (a
 short straight segment cutting across the corner). Garment-CAD convention
 is a miter (sharp point). With --miter, each bevel segment is replaced by
 the intersection of the two adjacent offset edges' tangent lines
 (v3.1: 12 bevels, see the miter report printed on run). Without --miter
-the SA path is written exactly as FreeSewing produced it (v3).
+the SA path is written exactly as given (v3).
 
 Library: write_dxf(input_path, output_path, miter=False) -> summary dict.
 CLI: `pattern write-dxf --input teagan-paths-v2.json --output teagan-fitted-v3.dxf [--miter]`
 
 Current scope: Teagan fitted tee layout (FRONT/BACK/SLEEVE, single size M).
 Style/size metadata are module constants for now; parameterizing them is
-part of the draft_freesewing tool (phase 2).
+future work.
 """
 import argparse
 import json
@@ -181,7 +181,7 @@ def _line_intersect(p1, d1, p2, d2):
 def miter_sa(ops):
     """Replace bevel joins in an SA path with miter (sharp) corners.
 
-    FreeSewing's SA offset joins sharp corners with a bevel: a short straight
+    The SA offset joins sharp corners with a bevel: a short straight
     segment cutting across the corner. Garment-CAD convention is a miter: the
     two offset edges extended to meet at a sharp point. A bevel is a 'line'
     op that is short (5-35 mm), not on the fold, and turns sharply (>10 deg)
@@ -280,7 +280,7 @@ def build_piece(sname, d, miter=False):
         return turn, curve
     seam_turn, seam_curve = split_points(seam)
     sa_turn, sa_curve = split_points(sa)
-    # --- notches: seam anchor (FreeSewing snippet) + cut-line projection ---
+    # --- notches: seam anchor (snippet from the input JSON) + cut-line projection ---
     notches = []  # (name, def, seam_pt, cut_pt, cut_dist)
     for n in d.get("notches", []):
         sp = (n["x"], -n["y"])
@@ -356,7 +356,7 @@ def build_piece(sname, d, miter=False):
 
 
 def write_dxf(input_path, output_path, miter=False):
-    """Write a DXF-AAMA file from FreeSewing JSON paths. Returns a summary dict."""
+    """Write a DXF-AAMA file from JSON paths. Returns a summary dict."""
     data = json.load(open(input_path))
     geos = {}
     for sname in data:
@@ -513,11 +513,11 @@ def write_dxf(input_path, output_path, miter=False):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description="Write a DXF-AAMA file (R12) from FreeSewing JSON paths.")
+    ap = argparse.ArgumentParser(description="Write a DXF-AAMA file (R12) from JSON paths.")
     ap.add_argument("--input", default="teagan-paths-v2.json")
     ap.add_argument("--output", default="teagan-fitted-v3.dxf")
     ap.add_argument("--miter", action="store_true",
-                    help="replace FreeSewing SA bevel joins with miter (sharp) corners")
+                    help="replace SA bevel joins with miter (sharp) corners")
     args = ap.parse_args(argv)
     result = write_dxf(args.input, args.output, miter=args.miter)
     hx0, hx1 = result["bbox_mm"]["x"]

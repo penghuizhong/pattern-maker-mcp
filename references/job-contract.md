@@ -20,7 +20,7 @@ jobs/<款号>/
 - `fit`：如 `classic`，并注明出处（品牌表 / 用户指定）
 - `seam_allowance_mm`：缝份，缺省不许默认一个数，必须用户或工艺单给
 - `construction`：结构要点，如开衩数、口袋型、扣数——**有出入的项写进 OPEN，不写进 construction 当定稿**
-- `engine`：本版用的出图引擎（生成链：`freesewing`；复刻链填 `dxf`，表示图案来自用户 DXF）
+- `engine`：本版用的出图引擎（复刻链填 `dxf`，表示图案来自用户 DXF）
 - `open_items`：OPEN 项清单，和 requirements.md 一致
 
 ## 版本规则

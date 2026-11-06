@@ -2,9 +2,33 @@
 
 按日期记。每次改动先写条目再发版；版本号只写在 SKILL.md 里（frontmatter 的 `version` 字段），发版时按它打 git tag。
 
+## 2026-11-06 — 删掉 FreeSewing
+
+- 用户决定：DXF 处理流程（收文件、量化、画编号图、量弧线、拟合贝塞尔、写分析）全是 Python + ezdxf，一行 FreeSewing 没用到；FreeSewing 的量体跟用户的不合，生成链不用它。删干净，不留旧新并存。
+- 删掉：`server/library/`（Brian、Teagan、零件库、40 套标准体、款 schema）、`server/engine/`（draft runner + measurements/settings/paths-format 数据）、`server/package.json` / `package-lock.json` / `node_modules/`（FreeSewing 框架 npm 依赖）、`server/src/pattern_making/freesewing.py`、MCP 工具 `draft_freesewing` / `freesewing_design_info`、CLI `pattern draft`、draft 相关测试。SKILL.md 的“生成”流程整节删掉，skill 只剩复刻一条链；根 README 目录架构与 server/README 同步改（4 个工具）。`write_dxf.py`、`aama-dxf.md`、`job-contract.md` 里 FreeSewing 的提法改成通用表述（输入点列的格式不变，写盘器照常用）。
+- 留下：`quantify`、`plot`、`write_dxf`、`check` 四个 DXF 工具与 MCP/CLI 入口；复刻工作流；T 恤模板分析与贝塞尔参数化方案。从 FreeSewing 学到的东西（贝塞尔控制点取弦长分数、袖山迭代拟合、袖笼构造）已写在 T 恤模板 ANALYSIS.md 里，删代码不丢。`teagan-paths-v2.json`（存档点列）仍在 `your_files/freesewing-teagan-test/`，`write_dxf` 测试继续用它。
+- 恢复办法：删掉的代码全在 git 历史里（最后在 `c621b43`），`git checkout c621b43 -- server/library server/engine server/package.json` 可拿回。版本不升（SKILL.md 仍 0.1.2，server 仍 0.2.0），不打新 tag。
+
+## 2026-11-06 — quantify 直接输出 # 号坐标（第 6 步并入第 3 步）
+
+- `quantify.py` 的 by-block（AAMA）模式现在每片输出 `numbered_points`：每个 `# N` 标签对应
+  它命名的 POINT 点（`xy_mm`，与 outline_points 同一套模型空间坐标；`layer`；`text_offset_mm` =
+  标签到点的距离）。以前 quantify 只记标签文字串和 POINT 个数，不记坐标，量袖笼/袖山还得
+  再读一遍 DXF 去定位每个 # 号（第 6 步）；现在一次量化就全有了，第 6 步不再需要。
+  匹配规则：标签与它命名的 POINT 在同一层（AAMA：2=拐点、4=刀口），先同层匹配，找不到才
+  跨层找——避免把密集的 3 层曲线点误当成 # 号点。只改 `server/src/pattern_making/quantify.py`，
+  不升版本。裤子 `user-dxf-1/quantified.json` 已用新版重跑（191 个 # 号），MCP 全套测试通过；
+  T 恤 `tshirt-template/quantified.json` 也已重跑，# 号坐标与旧的 `numbered_points.json` 核对一致
+  （差一个每片的模型空间平移，0.1mm 舍入内），旧的 `numbered_points.json` 已删，# 号坐标以
+  `quantified.json` 为唯一来源。
+
+## 2026-11-06 — draft 时去掉 measurements.json 的 source 键
+
+- `freesewing.py` 的 `draft()` 在传给 runner 之前去掉 measurements 里的 `source` 键。`source` 是 job 格式的元数据（量体来源，check.py 要求有），不是量体；不去掉 runner 会报 `measurement 'source' is not used by ...` 的 warning，还会把它写进 summary 的 measurements 里。修后 Brian 测试版 draft 的 warnings 为空。只改 `server/src/pattern_making/freesewing.py`，不升版本。
+
 ## 2026-11-06 — 根 README 补目录架构说明
 
-- 根 `README.md` 的“仓里有什么”改成完整的“目录架构”一节：整棵树 + 分层与边界（仓根 skill / server 工具、引擎与库、框架依赖与库源码、两个运行时一条 JSON 接口、数据文件是生成的、不在仓里的东西）+ 加东西往哪放的对照表。只改文档，不动代码。
+- 根 `README.md` 的“仓里有什么”改成完整的“目录架构”一节：整棵树 + 分层与边界（仓根 skill / server 工具、引擎与库、框架依赖与库源码、两个运行时一条 JSON 接口、数据文件是生成的、不在仓里的东西）+ 加东西往哪放的对照表。只改文档，不动代码。SKILL.md 工具一节补了一行指向（目录架构见 README.md），不重复贴树。
 
 ## 2026-11-06 — 通用生成纸样引擎 + 基础纸样库（server/engine/ + server/library/）
 

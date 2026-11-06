@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """MCP server for pattern-making tools (stdio transport).
 
-Exposes the six tools as typed MCP tools; the agent calls these instead
+Exposes the four tools as typed MCP tools; the agent calls these instead
 of running scripts by path. Tool results are summaries + file paths --
 the full quantified JSON stays in the file it was written to, not in
 the conversation.
@@ -11,21 +11,14 @@ Tools:
                     file; unmeasurable entities listed under `unsupported`)
   plot_numbered_dxf DXF -> numbered verification PNG (layer 2 black #,
                     layer 4 red #, cm units)
-  write_dxf_aama    FreeSewing JSON paths -> DXF-AAMA (R12, Teagan layout)
+  write_dxf_aama    JSON paths -> DXF-AAMA (R12, Teagan layout)
   check_job         validation gate on a job folder (normal + --release)
-  draft_freesewing  FreeSewing design -> SVG + JSON paths (any installed
-                    @freesewing/<design>; measurements + options from
-                    the caller, nothing hardcoded)
-  freesewing_design_info
-                    what a design needs: required measurements + option
-                    specs (defaults, min/max) -- from the design itself
 
 Run: `pattern serve` or `python -m pattern_making.server`.
 """
 from fastmcp import FastMCP
 
 from . import check as check_mod
-from . import freesewing as freesewing_mod
 from . import plot as plot_mod
 from . import quantify as quantify_mod
 from . import write_dxf as write_dxf_mod
@@ -89,13 +82,13 @@ def plot_numbered_dxf(dxf_path: str, out_png: str, title: str | None = None) -> 
 
 @mcp.tool
 def write_dxf_aama(paths_json: str, out_dxf: str, miter: bool = False) -> dict:
-    """Write a DXF-AAMA file (R12 / AC1009) from FreeSewing JSON paths.
+    """Write a DXF-AAMA file (R12 / AC1009) from JSON paths.
 
-    Input is the dump-json-v2.mjs format: {stack: {paths: {seam, sa,
+    Input is the paths JSON format: {stack: {paths: {seam, sa,
     grainline?}, notches, title}}. Output is one BLOCK per piece
     (Style.Piece.Size) + INSERT, standard layers 1/14/7/6/2/3/4, global
     # numbering per piece (seam walk then SA walk). With miter=True,
-    FreeSewing SA bevel joins become sharp miter corners (garment-CAD
+    SA bevel joins become sharp miter corners (garment-CAD
     convention). Current scope: Teagan fitted tee layout
     (FRONT/BACK/SLEEVE, single size M).
     """
@@ -116,38 +109,6 @@ def check_job(job_dir: str, release: bool = False) -> dict:
     worked around. Returns {"passed", "errors", "job", "release"}.
     """
     return check_mod.check(job_dir, release)
-
-
-@mcp.tool
-def draft_freesewing(design: str, measurements: dict, out_dir: str,
-                     options: dict | None = None, sa_mm: float = 10.0) -> dict:
-    """Draft a FreeSewing design into SVG + JSON paths.
-
-    Generic: design is any installed @freesewing/<name> (teagan, brian,
-    ... -- a design that is not installed fails with the installed
-    list). Measurements are millimetres, keyed by FreeSewing name
-    (e.g. chest, waist, shoulderToShoulder); options are the design's
-    own options (e.g. fitWaist, waistEase, chestEase) -- use
-    freesewing_design_info first to see what a design needs. Nothing
-    about any design is hardcoded: required measurements and option
-    specs are discovered from the design itself at draft time, unknown
-    options and out-of-range values come back as warnings. Returns the
-    summary (effective measurements/options, per-stack paths, warnings)
-    plus the three file paths; the paths JSON feeds write_dxf_aama.
-    """
-    return freesewing_mod.draft(design, measurements, options or {}, sa_mm, out_dir)
-
-
-@mcp.tool
-def freesewing_design_info(design: str) -> dict:
-    """What a FreeSewing design needs, from the design itself.
-
-    Required + optional measurements and every available option with
-    its default and min/max. Call this before draft_freesewing when the
-    design's measurements or options are not already known. A design
-    that is not installed fails with the installed list.
-    """
-    return freesewing_mod.design_info(design)
 
 
 def main():
