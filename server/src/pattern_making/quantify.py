@@ -16,6 +16,13 @@ quantify itself.
 Supported: LWPOLYLINE, POLYLINE, LINE, ARC, CIRCLE, SPLINE (flattened),
 TEXT, MTEXT. INSERT (block references) are counted but not expanded.
 
+In by-block (AAMA) mode each piece also carries `seam_allowance_mm`
+when it has a net outline (layer 14) and a cut outline (layer 1): the
+perpendicular distance from each net outline point to the nearest cut
+outline segment, as a distribution (min/p25/median/p75/p90/max). The
+median is the piece's prevailing allowance. It is measured this way --
+never from bbox extents, which overstate the allowance on a slanted edge.
+
 Library: quantify(inp, out=None, by_block=False, decode_gbk=False,
 unit_factor=None) -> the output dict (written to `out` when given).
 CLI: `pattern quantify --in pattern.dxf --out quantified.json [--by-block]
@@ -117,14 +124,51 @@ def flatten_entity(e):
     return None
 
 
-def nearest_on_polyline(pt, pts):
+def nearest_on_polyline(pt, pts, closed=False):
+    """Shortest distance from a point to a polyline (point-to-segment).
+    When closed, the closing segment (last point -> first point) is a real
+    edge and is included; omitting it overstates the distance for points
+    near that edge."""
+    segs = list(zip(pts, pts[1:]))
+    if closed and len(pts) > 1:
+        segs.append((pts[-1], pts[0]))
     best = 1e18
-    for a, b in zip(pts, pts[1:]):
+    for a, b in segs:
         vx, vy = b[0] - a[0], b[1] - a[1]
         L2 = vx * vx + vy * vy
         tt = 0 if L2 == 0 else max(0, min(1, ((pt[0] - a[0]) * vx + (pt[1] - a[1]) * vy) / L2))
         best = min(best, dist(pt, (a[0] + tt * vx, a[1] + tt * vy)))
     return best
+
+
+def _percentile(sorted_vals, q):
+    if not sorted_vals:
+        return None
+    return sorted_vals[min(len(sorted_vals) - 1, max(0, int(q * len(sorted_vals))))]
+
+
+def seam_allowance_mm(net_pts, cut_pts):
+    """Seam allowance between a net (seam) outline and a cut outline:
+    the perpendicular distance from each net outline point to the nearest
+    cut outline segment. Reported as a distribution because a piece can
+    carry different allowances (sides vs hem) and because points inside a
+    dart read far from the cut outline, which bridges the dart. The median
+    is the piece's prevailing allowance. Never a bbox difference: on a
+    slanted edge the bbox delta overstates the allowance (a true 1.0 cm
+    allowance once read as 1.45 cm from bbox y-extents)."""
+    ds = sorted(nearest_on_polyline(p, cut_pts, closed=True) for p in net_pts)
+    return {
+        "net_layer": "14",
+        "cut_layer": "1",
+        "n_points": len(ds),
+        "min_mm": round(ds[0], 1),
+        "p25_mm": round(_percentile(ds, 0.25), 1),
+        "median_mm": round(_percentile(ds, 0.5), 1),
+        "p75_mm": round(_percentile(ds, 0.75), 1),
+        "p90_mm": round(_percentile(ds, 0.9), 1),
+        "max_mm": round(ds[-1], 1),
+        "method": "perpendicular distance from each net outline point to the nearest cut outline segment",
+    }
 
 
 def quantify_by_block(doc, factor, use_gbk):
@@ -210,6 +254,18 @@ def quantify_by_block(doc, factor, use_gbk):
         for layer, ms in p["layers"].items():
             for m in ms:
                 m["outline_points"] = m.get("outline_points", [])
+    # Seam allowance (AAMA): perpendicular distance from the net outline
+    # (layer 14) to the cut outline (layer 1), as a distribution. Computed
+    # here so no one measures it from bbox extents again -- that is wrong
+    # on a slanted edge.
+    for piece, p in pieces.items():
+        nets = [m for m in p["layers"].get("14", []) if m.get("closed") and m.get("outline_points")]
+        cuts = [m for m in p["layers"].get("1", []) if m.get("closed") and m.get("outline_points")]
+        if not nets or not cuts:
+            continue
+        net_pts = [tuple(q) for q in max(nets, key=lambda m: m["perimeter_mm"])["outline_points"]]
+        cut_pts = [tuple(q) for q in max(cuts, key=lambda m: m["perimeter_mm"])["outline_points"]]
+        p["seam_allowance_mm"] = seam_allowance_mm(net_pts, cut_pts)
     return pieces, unsupported
 
 
@@ -311,6 +367,10 @@ def _print_summary(result, out):
                           + (f", area {m['area_mm2']} mm2" if m["area_mm2"] else "") + f", closed={m['closed']}")
             print(f"   texts: {p['texts'][:8]}  point_count: {p['point_count']}"
                   + (f"  numbered: {len(p.get('numbered_points', {}))}" if p.get('numbered_points') is not None else ""))
+            sa = p.get("seam_allowance_mm")
+            if sa:
+                print(f"   seam allowance (net 14 -> cut 1, perpendicular): median {sa['median_mm']} mm"
+                      f" (p25 {sa['p25_mm']}, p75 {sa['p75_mm']}, p90 {sa['p90_mm']}, max {sa['max_mm']}, n={sa['n_points']})")
     else:
         pieces = result["pieces"]
         print(f"pieces: {sorted(pieces)}")

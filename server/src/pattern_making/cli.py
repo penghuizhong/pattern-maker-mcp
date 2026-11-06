@@ -6,6 +6,7 @@ from . import __version__
 from . import check as check_mod
 from . import plot as plot_mod
 from . import quantify as quantify_mod
+from . import reanchor as reanchor_mod
 from . import write_dxf as write_dxf_mod
 
 
@@ -39,6 +40,13 @@ def build_parser():
     p.add_argument("--job", required=True)
     p.add_argument("--release", action="store_true")
 
+    p = sub.add_parser("reanchor", help="re-anchor defined segments onto a new DXF version")
+    p.add_argument("--anchors", required=True, help="segments-anchors.json with block-local anchor coords")
+    p.add_argument("--in", dest="src", required=True)
+    p.add_argument("--out", default=None)
+    p.add_argument("--tolerance", type=float, default=0.3,
+                   help="max anchor-to-# distance in cm (default 0.3)")
+
     sub.add_parser("serve", help="start the MCP server (stdio)")
     return ap
 
@@ -69,6 +77,11 @@ def main(argv=None):
         if args.release:
             argv2.append("--release")
         return check_mod.main(argv2)
+    if args.cmd == "reanchor":
+        argv2 = ["--anchors", args.anchors, "--in", args.src, "--tolerance", str(args.tolerance)]
+        if args.out is not None:
+            argv2 += ["--out", args.out]
+        return reanchor_mod.main(argv2)
     if args.cmd == "serve":
         from .server import main as serve_main
         return serve_main()

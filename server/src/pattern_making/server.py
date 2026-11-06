@@ -12,6 +12,8 @@ Tools:
   plot_numbered_dxf DXF -> numbered verification PNG (layer 2 black #,
                     layer 4 red #, cm units)
   write_dxf_aama    JSON paths -> DXF-AAMA (R12, Teagan layout)
+  reanchor_segments anchors JSON + new DXF -> segments re-derived by
+                    position (block-local anchor coords) and re-measured
   check_job         validation gate on a job folder (normal + --release)
 
 Run: `pattern serve` or `python -m pattern_making.server`.
@@ -21,6 +23,7 @@ from fastmcp import FastMCP
 from . import check as check_mod
 from . import plot as plot_mod
 from . import quantify as quantify_mod
+from . import reanchor as reanchor_mod
 from . import write_dxf as write_dxf_mod
 
 mcp = FastMCP("pattern-making")
@@ -93,6 +96,24 @@ def write_dxf_aama(paths_json: str, out_dxf: str, miter: bool = False) -> dict:
     (FRONT/BACK/SLEEVE, single size M).
     """
     return write_dxf_mod.write_dxf(paths_json, out_dxf, miter=miter)
+
+
+@mcp.tool
+def reanchor_segments(anchors_path: str, dxf_path: str, out_json: str | None = None,
+                      tolerance_cm: float = 0.3) -> dict:
+    """Re-anchor user-defined segments onto a new DXF version.
+
+    # numbers are volatile across versions (adding a line or deleting a
+    notch renumbers them), so segments are stored by POSITION: each
+    endpoint is a block-local coordinate in anchors_path
+    (segments-anchors.json). This matches each anchor to the nearest #
+    point in the new file (within tolerance_cm), re-derives the
+    segment's # definition, and re-measures it along the net outline
+    (curved) or as a straight line (internal lines). Anchors that match
+    nothing are listed under `unmatched`, never silently dropped.
+    Returns the per-segment # mapping and lengths.
+    """
+    return reanchor_mod.reanchor(anchors_path, dxf_path, out_json, tolerance_cm)
 
 
 @mcp.tool

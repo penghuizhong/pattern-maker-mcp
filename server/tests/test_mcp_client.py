@@ -59,7 +59,7 @@ async def main():
             names = [t.name for t in tools.tools]
             print("tools:", names)
             assert names == ["quantify_dxf", "plot_numbered_dxf", "write_dxf_aama",
-                             "check_job"], names
+                             "reanchor_segments", "check_job"], names
             for t in tools.tools:
                 print(f"  {t.name}: {json.dumps(t.input_schema.get('properties', {}), ensure_ascii=False)[:220]}")
 
@@ -89,6 +89,27 @@ async def main():
             print("write_dxf pieces:", r["pieces"], "| numbers:", r["total_numbers"],
                   "| notches:", r["notches"])
             assert r["total_numbers"] == 102 and r["notches"] == 4
+
+            # 3b. reanchor: women's block v2 anchors onto the v3 DXF.
+            # # numbers shuffled v2->v3, but every anchor must match and
+            # every segment length must equal its v2 value.
+            anchors = str(JOBS_ROOT / "womens-block-v2" / "outputs" / "v0.1" / "segments-anchors.json")
+            v3dxf = str(JOBS_ROOT / "womens-block-v3" / "source.dxf")
+            if Path(anchors).exists() and Path(v3dxf).exists():
+                r = tool_json(await session.call_tool("reanchor_segments", {
+                    "anchors_path": anchors, "dxf_path": v3dxf,
+                    "out_json": "/tmp/mcp-reanchored.json"}))
+                print("reanchor segments:", len(r["segments"]), "| unmatched:", r["unmatched"])
+                assert r["unmatched"] == []
+                expect = {"后领围线": 8.63, "后中长": 39.5, "胸围线": 48.0, "腰围线": 48.0,
+                          "背宽线": 18.5, "后小肩长": 12.62, "前小肩长": 12.6,
+                          "前领围线": 12.32, "前中长": 35.0, "乳距宽": 9.0,
+                          "后袖笼长": 22.78, "前袖笼长": 21.9}
+                got = {s["name"]: s["length_cm"] for s in r["segments"]}
+                assert got == expect, got
+                print("reanchor lengths == v2 lengths")
+            else:
+                print("reanchor skipped: womens-block v2/v3 jobs not present")
 
             # 4a. check normal + release (job has approval.md)
             r = tool_json(await session.call_tool("check_job", {"job_dir": JOB}))
