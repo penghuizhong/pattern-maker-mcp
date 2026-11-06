@@ -2,6 +2,28 @@
 
 按日期记。每次改动先写条目再发版；版本号只写在 SKILL.md 里（frontmatter 的 `version` 字段），发版时按它打 git tag。
 
+## 2026-11-06 — 通用生成纸样引擎 + 基础纸样库（server/engine/ + server/library/）
+
+- 按用户要求去 Codeberg 把 FreeSewing 的底拿进来，做成本项目的通用生成纸样引擎和基础纸样库，目录架构规范化。先 clone 整个 monorepo（shallow + sparse）核对结构：framework 是 `packages/core`（7.3k 行：Design/Pattern/Point/Path/Store/Stack/SVG 渲染、插件系统）+ `plugins/`；数据结构是 `packages/config` 的 42 个标准量体（只有 shoulderSlope 是角度，其余毫米）+ core 的 pattern settings 默认值；计算公式是各款 `src/*.mjs` 的 draft 函数；款式数据是各款 `about.json` + `i18n/` + `packages/models` 的标准量体套（neckstimate 从颈围推算）。
+- 分工定死：框架（core + 插件）是 pinned 依赖（server/package.json，exact 4.10.2，lockfile 为凭），不 fork；纸样库是源码进仓（`server/library/`），以后自家款也按同样形状放进来。runner（`server/engine/runner/draft.mjs`）先从库里找款（扫 `library/<分类>/<款名>/src/index.mjs`，分类只是组织、不定死），没有才去 npm 找；`source: library/npm` 写进 summary，库优先。
+- 库里三款（FreeSewing 4.10.2，MIT，见 `server/library/NOTICE.md`，只改了库内互相引用的 import、改成相对路径）：`blocks/brian/`（男装身原型，11 个量体）、`designs/teagan/`（收腰针织 T，13 个量体）、`parts/library/`（可复用部件：袖子、矩形、两片袖、三片帽）。依赖链 teagan → brian → library → core。款测试没收（依赖 monorepo 的共享测试架子），本项目用 draft 对比 + MCP 测试验。
+- 数据结构落地为文件（`server/engine/data/generate.mjs` 生成，改框架版本或加款后重跑）：`measurements.json`（42 量体）、`settings.json`（core 默认值 + sa 默认 10mm）、`paths-format.md`（点列 JSON 格式说明）；`library/data/models.json`（40 套标准量体）、`schemas/<款>.json`（各款要什么量体、选项的默认值与上下限，与 `freesewing_design_info` 同源）。
+- 验证：库里 Teagan 点列与存档 `teagan-paths-v2.json` 逐项相等（SVG 36795 字节与 npm 版一致），Brian 库里出图正常；MCP 全套测试通过（含 source: library 断言、draft→write_dxf 链 102 号/4 刀口）；测试自己重建 /tmp/job-test（/tmp 会被清掉）。旧 `server/freesewing/` 目录已删（从未进 git），Node 根现在是 `server/`（package.json + node_modules）。
+- SKILL.md 工具一节与生成链第 3 步同步改成“款从项目自己的库出”。SKILL.md 版本不变（仍 0.1.2），不打新 tag。
+
+## 2026-11-06 — FreeSewing 生图服务：draft_freesewing（server 0.2.0）
+
+- 新增第 5、6 个工具 `draft_freesewing` / `freesewing_design_info`（MCP + `pattern draft` CLI），server 升 0.2.0；SKILL.md 工具表与生成链第 3 步同步改成调工具。SKILL.md 版本不变（仍 0.1.2），不打新 tag。
+- 生图不再定死款：款名、量体、选项全由调用方传；款要什么量体、有什么选项（默认值、上下限）由工具运行时从款本身查（`pattern.getConfig()`，FreeSewing 官方口径：量体与选项由款定义，不由 core 定义）；已装哪些款由工具运行时从 `node_modules/@freesewing/*` 里认（导出了款构造函数的才是款——keywords 与 about.json 不区分，实测 core、插件、library 全带 "design" 关键词）。新款只须 `cd server/freesewing && npm install @freesewing/<款名>`。
+- 验证（MCP 全套测试通过）：Teagan 收腰版的点列 JSON 与存档 `teagan-paths-v2.json` 在写盘契约（seam、sa、grainline、刀口、title、topLeft）上逐项相等，SVG 除主题的日期戳外与 `teagan-fitted.svg` 一致；Brian 同一套量体照常出图（3 片，hips/waist 报未用——它只要 11 个量体），证明 runner 不只认 Teagan；缺量体、未装款（aaron）都按预期报错并给出所缺/已装清单；未知选项名、超上下限只报 warning 不静默；draft 出来的新点列走 `write_dxf_aama --miter` 照常出 102 号、4 刀口。
+- 实现细节：`server/freesewing/draft.mjs`（Node runner，`--design/--measurements/--options/--sa/--out`，另有 `--info` 与 `--list-designs`）+ `server/src/pattern_making/freesewing.py`（Python 封装）；一次调用跑两次 draft（一次不带主题出点列 JSON、一次带主题出 SVG，几何相同）；pct 选项传的是小数（0.08 = 8%），spec 的上下限是百分数，runner 换算后再比上下限；丝缕线按名含 grainline 认（macro 路径名如 `__macro_grainline_grainline_line`），同时按 `grainline` 键暴露给写盘器。
+
+## 2026-11-06 — SKILL.md 瘦身：工具改走 server/
+
+- SKILL.md 瘦身：几何和校验改调 `server/` 的工具（MCP 优先，`pattern` CLI 备用），新增工具对照表；`scripts/` 4 个脚本（check_job.py、dxf_quantify.py、to-dxf-v3.py、dxf_plot.py）已删（trash 可恢复至 2026-12-06，git 历史里也有）。
+- references/validation-gate.md 与 aama-dxf.md 的工具引用同步改成 MCP 工具名 + `pattern` 命令；README（仓里有什么、使用、快速验证）同步改。
+- 版本不变（SKILL.md 仍 0.1.2），不打新 tag。
+
 ## 2026-11-06 — SKILL.md 重构：只讲通用流程
 
 - 标题去掉版本号；版本号只剩 frontmatter 的 `version` 字段（README 版本管理一节同步改了）。

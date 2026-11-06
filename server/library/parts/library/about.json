@@ -1,0 +1,13 @@
+{
+  "id": "library",
+  "code": "Joost De Cock",
+  "design": "Joost De Cock",
+  "description": "A FreeSewing design that bundles reuseable parts",
+  "name": "Design Part Library",
+  "difficulty": 2,
+  "tags": [],
+  "techniques": [],
+  "version": "4.10.2",
+  "pkg": "@freesewing/library",
+  "collection": true
+}

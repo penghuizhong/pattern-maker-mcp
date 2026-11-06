@@ -2,7 +2,7 @@
 
 把纸样几何写成符合 AAMA 惯例的 DXF 交换文件。ASTM（D6673）暂不做：链路（ETCAD、国内工厂、Gerber/Lectra）认 AAMA；ASTM 等接收方明确要求时再做。
 
-参考实现：`scripts/to-dxf-v3.py`（FreeSewing JSON 点列 → DXF）。
+参考实现：`server/src/pattern_making/write_dxf.py`（`write_dxf_aama` 工具；FreeSewing JSON 点列 → DXF）。
 验证脚本：`verify-aama-v3.py`（随输出文件放在同一目录，`--file/--turn/--numbers` 可验 v3.1）。
 首个验证产物：Teagan 修身针织 T 恤 `teagan-fitted-v3.dxf`（单码 M，量体为临时凑值，非产品尺寸）；v3.1 `teagan-fitted-v3.1.dxf` 是同一数据的尖角版（--miter，编号 #1–#102），v3 保留为斜切对照。
 

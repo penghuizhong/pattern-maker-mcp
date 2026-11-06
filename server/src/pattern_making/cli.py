@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""`pattern` command line: quantify | plot | write-dxf | check | serve."""
+"""`pattern` command line: quantify | plot | write-dxf | check | draft | serve."""
 import argparse
 
 from . import __version__
 from . import check as check_mod
+from . import freesewing as freesewing_mod
 from . import plot as plot_mod
 from . import quantify as quantify_mod
 from . import write_dxf as write_dxf_mod
@@ -39,6 +40,15 @@ def build_parser():
     p.add_argument("--job", required=True)
     p.add_argument("--release", action="store_true")
 
+    p = sub.add_parser("draft", help="draft a FreeSewing design (any installed @freesewing/<name>)")
+    p.add_argument("--design", help="design name, e.g. teagan")
+    p.add_argument("--measurements", help="JSON file of measurements (mm)")
+    p.add_argument("--options", help="JSON file of design options")
+    p.add_argument("--sa", type=float, default=10.0, help="seam allowance in mm (default 10)")
+    p.add_argument("--out", help="output directory for svg + paths JSON + summary")
+    p.add_argument("--info", action="store_true", help="print what the design needs, do not draft")
+    p.add_argument("--list-designs", action="store_true", help="print installed designs")
+
     sub.add_parser("serve", help="start the MCP server (stdio)")
     return ap
 
@@ -69,6 +79,26 @@ def main(argv=None):
         if args.release:
             argv2.append("--release")
         return check_mod.main(argv2)
+    if args.cmd == "draft":
+        # Pass through only what was given; freesewing's parser reports
+        # anything missing (--design, --measurements/--out).
+        argv2 = []
+        if args.list_designs:
+            argv2.append("--list-designs")
+        else:
+            if args.design:
+                argv2 += ["--design", args.design]
+            if args.info:
+                argv2.append("--info")
+            else:
+                if args.measurements:
+                    argv2 += ["--measurements", args.measurements]
+                argv2 += ["--sa", str(args.sa)]
+                if args.out:
+                    argv2 += ["--out", args.out]
+                if args.options:
+                    argv2 += ["--options", args.options]
+        return freesewing_mod.main(argv2)
     if args.cmd == "serve":
         from .server import main as serve_main
         return serve_main()

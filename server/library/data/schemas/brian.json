@@ -1,0 +1,261 @@
+{
+ "design": "brian",
+ "version": "4.10.2",
+ "source": "library",
+ "requiredMeasurements": [
+  "biceps",
+  "chest",
+  "hpsToBust",
+  "hpsToWaistBack",
+  "neck",
+  "shoulderToShoulder",
+  "shoulderSlope",
+  "waistToArmpit",
+  "waistToHips",
+  "shoulderToWrist",
+  "wrist"
+ ],
+ "optionalMeasurements": [
+  "highBust"
+ ],
+ "options": {
+  "libraryFitSleeve": {
+   "type": "boolean",
+   "default": true
+  },
+  "brianFitCollar": {
+   "type": "boolean",
+   "default": true
+  },
+  "collarFactor": {
+   "type": "number",
+   "default": 4.8
+  },
+  "bicepsEase": {
+   "type": "pct",
+   "default": 15,
+   "min": 0,
+   "max": 50
+  },
+  "chestEase": {
+   "type": "pct",
+   "default": 15,
+   "min": -4,
+   "max": 35
+  },
+  "collarEase": {
+   "type": "pct",
+   "default": 5,
+   "min": 0,
+   "max": 10
+  },
+  "cuffEase": {
+   "type": "pct",
+   "default": 20,
+   "min": 0,
+   "max": 200
+  },
+  "draftForHighBust": {
+   "type": "bool",
+   "default": false
+  },
+  "shoulderEase": {
+   "type": "pct",
+   "default": 0,
+   "min": -2,
+   "max": 6
+  },
+  "lengthBonus": {
+   "type": "pct",
+   "default": 0,
+   "min": -4,
+   "max": 60
+  },
+  "s3Collar": {
+   "type": "pct",
+   "default": 0,
+   "min": -100,
+   "max": 100
+  },
+  "s3Armhole": {
+   "type": "pct",
+   "default": 0,
+   "min": -100,
+   "max": 100
+  },
+  "acrossBackFactor": {
+   "type": "pct",
+   "default": 98,
+   "min": 93,
+   "max": 100
+  },
+  "armholeDepth": {
+   "type": "pct",
+   "default": 2,
+   "min": -10,
+   "max": 50
+  },
+  "armholeDepthFactor": {
+   "type": "pct",
+   "default": 55,
+   "min": 50,
+   "max": 70
+  },
+  "backNeckCutout": {
+   "type": "pct",
+   "default": 5,
+   "min": 2,
+   "max": 8
+  },
+  "frontArmholeDeeper": {
+   "type": "pct",
+   "default": 0.2,
+   "min": 0,
+   "max": 0.5
+  },
+  "shoulderSlopeReduction": {
+   "type": "pct",
+   "default": 0,
+   "min": 0,
+   "max": 80
+  },
+  "legacyArmholeDepth": {
+   "type": "bool",
+   "default": false
+  },
+  "optionPrefix": {
+   "type": "string",
+   "default": ""
+  },
+  "mockSleeve": {
+   "type": "boolean",
+   "default": false
+  },
+  "sleevecapEase": {
+   "type": "pct",
+   "default": 0,
+   "min": 0,
+   "max": 10
+  },
+  "sleevecapTopFactorX": {
+   "type": "pct",
+   "default": 50,
+   "min": 25,
+   "max": 75
+  },
+  "sleevecapTopFactorY": {
+   "type": "pct",
+   "default": 45,
+   "min": 35,
+   "max": 125
+  },
+  "sleevecapBackFactorX": {
+   "type": "pct",
+   "default": 60,
+   "min": 35,
+   "max": 65
+  },
+  "sleevecapBackFactorY": {
+   "type": "pct",
+   "default": 33,
+   "min": 30,
+   "max": 65
+  },
+  "sleevecapFrontFactorX": {
+   "type": "pct",
+   "default": 55,
+   "min": 35,
+   "max": 65
+  },
+  "sleevecapFrontFactorY": {
+   "type": "pct",
+   "default": 33,
+   "min": 30,
+   "max": 65
+  },
+  "sleevecapQ1Offset": {
+   "type": "pct",
+   "default": 1.7,
+   "min": 0,
+   "max": 7
+  },
+  "sleevecapQ2Offset": {
+   "type": "pct",
+   "default": 3.5,
+   "min": 0,
+   "max": 7
+  },
+  "sleevecapQ3Offset": {
+   "type": "pct",
+   "default": 2.5,
+   "min": 0,
+   "max": 7
+  },
+  "sleevecapQ4Offset": {
+   "type": "pct",
+   "default": 1,
+   "min": 0,
+   "max": 7
+  },
+  "sleevecapQ1Spread1": {
+   "type": "pct",
+   "default": 10,
+   "min": 4,
+   "max": 20
+  },
+  "sleevecapQ1Spread2": {
+   "type": "pct",
+   "default": 15,
+   "min": 4,
+   "max": 20
+  },
+  "sleevecapQ2Spread1": {
+   "type": "pct",
+   "default": 15,
+   "min": 4,
+   "max": 20
+  },
+  "sleevecapQ2Spread2": {
+   "type": "pct",
+   "default": 10,
+   "min": 4,
+   "max": 20
+  },
+  "sleevecapQ3Spread1": {
+   "type": "pct",
+   "default": 10,
+   "min": 4,
+   "max": 20
+  },
+  "sleevecapQ3Spread2": {
+   "type": "pct",
+   "default": 8,
+   "min": 4,
+   "max": 20
+  },
+  "sleevecapQ4Spread1": {
+   "type": "pct",
+   "default": 7,
+   "min": 4,
+   "max": 20
+  },
+  "sleevecapQ4Spread2": {
+   "type": "pct",
+   "default": 6.3,
+   "min": 4,
+   "max": 20
+  },
+  "sleeveLengthBonus": {
+   "type": "pct",
+   "default": 0,
+   "min": -40,
+   "max": 10
+  },
+  "sleeveWidthGuarantee": {
+   "type": "pct",
+   "default": 90,
+   "min": 25,
+   "max": 100
+  }
+ }
+}

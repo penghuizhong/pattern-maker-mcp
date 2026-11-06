@@ -1,0 +1,201 @@
+{
+ "design": "library",
+ "version": "4.10.2",
+ "source": "library",
+ "requiredMeasurements": [
+  "biceps",
+  "hpsToWaistBack",
+  "shoulderToWrist",
+  "waistToArmpit",
+  "wrist",
+  "shoulderToElbow",
+  "head"
+ ],
+ "optionalMeasurements": [],
+ "options": {
+  "mockRectangle": {
+   "type": "boolean",
+   "default": false
+  },
+  "noSa": {
+   "type": "boolean",
+   "default": false
+  },
+  "seamClasses": {
+   "type": "string",
+   "default": "fabric"
+  },
+  "rectangleWidth": {
+   "type": "pct",
+   "default": 100,
+   "min": 50,
+   "max": 150
+  },
+  "rectangleHeight": {
+   "type": "pct",
+   "default": 100,
+   "min": 50,
+   "max": 150
+  },
+  "optionPrefix": {
+   "type": "string",
+   "default": ""
+  },
+  "mockSleeve": {
+   "type": "boolean",
+   "default": false
+  },
+  "sleevecapEase": {
+   "type": "pct",
+   "default": 0,
+   "min": 0,
+   "max": 10
+  },
+  "sleevecapTopFactorX": {
+   "type": "pct",
+   "default": 50,
+   "min": 25,
+   "max": 75
+  },
+  "sleevecapTopFactorY": {
+   "type": "pct",
+   "default": 45,
+   "min": 35,
+   "max": 125
+  },
+  "sleevecapBackFactorX": {
+   "type": "pct",
+   "default": 60,
+   "min": 35,
+   "max": 65
+  },
+  "sleevecapBackFactorY": {
+   "type": "pct",
+   "default": 33,
+   "min": 30,
+   "max": 65
+  },
+  "sleevecapFrontFactorX": {
+   "type": "pct",
+   "default": 55,
+   "min": 35,
+   "max": 65
+  },
+  "sleevecapFrontFactorY": {
+   "type": "pct",
+   "default": 33,
+   "min": 30,
+   "max": 65
+  },
+  "sleevecapQ1Offset": {
+   "type": "pct",
+   "default": 1.7,
+   "min": 0,
+   "max": 7
+  },
+  "sleevecapQ2Offset": {
+   "type": "pct",
+   "default": 3.5,
+   "min": 0,
+   "max": 7
+  },
+  "sleevecapQ3Offset": {
+   "type": "pct",
+   "default": 2.5,
+   "min": 0,
+   "max": 7
+  },
+  "sleevecapQ4Offset": {
+   "type": "pct",
+   "default": 1,
+   "min": 0,
+   "max": 7
+  },
+  "sleevecapQ1Spread1": {
+   "type": "pct",
+   "default": 10,
+   "min": 4,
+   "max": 20
+  },
+  "sleevecapQ1Spread2": {
+   "type": "pct",
+   "default": 15,
+   "min": 4,
+   "max": 20
+  },
+  "sleevecapQ2Spread1": {
+   "type": "pct",
+   "default": 15,
+   "min": 4,
+   "max": 20
+  },
+  "sleevecapQ2Spread2": {
+   "type": "pct",
+   "default": 10,
+   "min": 4,
+   "max": 20
+  },
+  "sleevecapQ3Spread1": {
+   "type": "pct",
+   "default": 10,
+   "min": 4,
+   "max": 20
+  },
+  "sleevecapQ3Spread2": {
+   "type": "pct",
+   "default": 8,
+   "min": 4,
+   "max": 20
+  },
+  "sleevecapQ4Spread1": {
+   "type": "pct",
+   "default": 7,
+   "min": 4,
+   "max": 20
+  },
+  "sleevecapQ4Spread2": {
+   "type": "pct",
+   "default": 6.3,
+   "min": 4,
+   "max": 20
+  },
+  "sleeveLengthBonus": {
+   "type": "pct",
+   "default": 0,
+   "min": -40,
+   "max": 10
+  },
+  "sleeveWidthGuarantee": {
+   "type": "pct",
+   "default": 90,
+   "min": 25,
+   "max": 100
+  },
+  "mockTwoPartSleeve": {
+   "type": "boolean",
+   "default": false
+  },
+  "cuffEase": {
+   "type": "pct",
+   "default": 40,
+   "min": 2,
+   "max": 100
+  },
+  "sleeveBend": {
+   "type": "deg",
+   "default": 10,
+   "min": 0,
+   "max": 20
+  },
+  "sleevecapHeight": {
+   "type": "pct",
+   "default": 45,
+   "min": 40,
+   "max": 60
+  },
+  "mockThreePartHood": {
+   "type": "boolean",
+   "default": false
+  }
+ }
+}

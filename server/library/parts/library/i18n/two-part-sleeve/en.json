@@ -1,0 +1,32 @@
+{
+  "t": "Library/TwoPartSleeve",
+  "d": "A two-part sleeve from the library of FreeSewing design parts",
+  "p": {
+    "topsleeve": "Topsleeve",
+    "undersleeve": "Undersleeve",
+    "twoPartSleeve": "Two-Part Sleeve (base)"
+  },
+  "s": {},
+  "o": {
+    "cuffEase": {
+      "t": "Cuff ease",
+      "d": "The amount of ease at your wrist."
+    },
+    "sleevecapHeight": {
+      "t": "Sleevecap height",
+      "d": "Controls the height of the sleevecap."
+    },
+    "sleevecapEase": {
+      "t": "Sleevecap ease",
+      "d": "The amount by which the sleevecap seam is longer than the armhole seam."
+    },
+    "sleeveBend": {
+      "t": "Sleeve bend",
+      "d": "Controls the bend of the sleeve at the elbow."
+    },
+    "sleeveLengthBonus": {
+      "t": "Sleeve length bonus",
+      "d": "The amount to lengthen the sleeve. A negative value will shorten it."
+    }
+  }
+}

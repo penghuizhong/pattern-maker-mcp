@@ -1,0 +1,108 @@
+{
+  "t": "Library/Sleeve",
+  "d": "A sleeve from the library of FreeSewing design parts",
+  "p": {
+    "sleeve": "Sleeve"
+  },
+  "s": {
+      "backArmholeLength": "The length of the armhole at the back of the garment",
+      "backArmholeToArmholePitch": "The length along the armhole from the bottom of the armhole to the back armhole pitch point",
+      "frontArmholeLength": "The length of the armhole at the front of the garment",
+      "frontArmholeToArmholePitch": "The length along the armhole from the bottom of the armhole to the front armhole pitch point",
+      "sleevecapLength": "The length of the sleevecap",
+      "sleeveLength": "The length of the sleeve",
+      "sleevecapTarget": "The theoretical length of the sleevecap we strive for",
+      "sleevecapEase": "The mount of sleevecap ease",
+      "__sleevecapFactor": "An internal variable that is used to tweak the sleevecap draft"
+  },
+  "o": {
+    "cuffEase": {
+      "t": "Cuff ease",
+      "d": "The amount of ease at your wrist."
+    },
+    "sleevecapEase": {
+      "t": "Sleevecap ease",
+      "d": "The amount by which the sleevecap seam is longer than the armhole seam."
+    },
+    "sleevecapTopFactorX": {
+      "t": "Sleevecap top X",
+      "d": "Controls the horizontal location of the sleevecap top."
+    },
+    "sleevecapTopFactorY": {
+      "t": "Sleevecap top Y",
+      "d": "Controls the height of the sleevecap. A higher value results in a higher and more narrow sleevecap."
+    },
+    "sleevecapBackFactorX": {
+      "t": "Sleevecap back X",
+      "d": "Controls the placement of the sleevecap back pitchpoint on the X-axis (horizontal)"
+    },
+    "sleevecapBackFactorY": {
+      "t": "Sleevecap back Y",
+      "d": "Controls the placement of the sleevecap back pitchpoint on the Y-axis (vertical)"
+    },
+    "sleevecapFrontFactorX": {
+      "t": "Sleevecap front X",
+      "d": "Controls the placement of the sleevecap front pitchpoint on the X-axis (horizontal)"
+    },
+    "sleevecapFrontFactorY": {
+      "t": "Sleevecap front Y",
+      "d": "Controls the placement of the sleevecap front pitchpoint on the Y-axis (vertical)"
+    },
+    "sleevecapQ1Offset": {
+      "t": "Sleevecap Q1 offset",
+      "d": "Controls the curvature of the sleevecap in the first quadrant (front armhole)"
+    },
+    "sleevecapQ2Offset": {
+      "t": "Sleevecap Q2 offset",
+      "d": "Controls the curvature of the sleevecap in the second quadrant (front shoulder)"
+    },
+    "sleevecapQ3Offset": {
+      "t": "Sleevecap Q3 offset",
+      "d": "Controls the curvature of the sleevecap in the third quadrant (back shoulder)"
+    },
+    "sleevecapQ4Offset": {
+      "t": "Sleevecap Q4 offset",
+      "d": "Controls the curvature of the sleevecap in the fourth quadrant (back armhole)"
+    },
+    "sleevecapQ1Spread1": {
+      "t": "Sleevecap Q1 downward spread",
+      "d": "Controls the spread of the sleevecap first quadrant curvature towards the armhole"
+    },
+    "sleevecapQ1Spread2": {
+      "t": "Sleevecap Q1 upward spread",
+      "d": "Controls the spread of the sleevecap first quadrant curvature towards the shoulder"
+    },
+    "sleevecapQ2Spread1": {
+      "t": "Sleevecap Q2 downward spread",
+      "d": "Controls the spread of the sleevecap second quadrant curvature towards the armhole"
+    },
+    "sleevecapQ2Spread2": {
+      "t": "Sleevecap Q2 upward spread",
+      "d": "Controls the spread of the sleevecap second quadrant curvature towards the shoulder"
+    },
+    "sleevecapQ3Spread1": {
+      "t": "Sleevecap Q3 upward spread",
+      "d": "Controls the spread of the sleevecap third quadrant curvature towards the shoulder"
+    },
+    "sleevecapQ3Spread2": {
+      "t": "Sleevecap Q3 downward spread",
+      "d": "Controls the spread of the sleevecap third quadrant curvature towards the armhole"
+    },
+    "sleevecapQ4Spread1": {
+      "t": "Sleevecap Q4 upward spread",
+      "d": "Controls the spread of the sleevecap fourth quadrant curvature towards the shoulder"
+    },
+    "sleevecapQ4Spread2": {
+      "t": "Sleevecap Q4 downward spread",
+      "d": "Controls the spread of the sleevecap fourth quadrant curvature towards the armhole"
+    },
+    "sleeveLengthBonus": {
+      "t": "Sleeve length bonus",
+      "d": "The amount to lengthen the sleeve. A negative value will shorten it."
+    },
+    "sleeveWidthGuarantee": {
+      "t": "Sleeve width guarantee",
+      "d": "Controls how much of the sleeve width will be guaranteed. This determines how much we can alter the sleeve width to fit the sleeve in the armhole."
+    }
+  }
+}

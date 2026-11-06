@@ -1,10 +1,10 @@
 # Validation gate — 校验门与审批门
 
-## 机器门：check_job.py（每次出版必跑）
+## 机器门：check_job 工具（每次出版必跑）
 
 ```bash
-python3 scripts/check_job.py --job jobs/<款号>
-python3 scripts/check_job.py --job jobs/<款号> --release
+pattern check --job jobs/<款号>
+pattern check --job jobs/<款号> --release
 ```
 
 普通检查（不带 `--release`）查：
@@ -30,7 +30,7 @@ python3 scripts/check_job.py --job jobs/<款号> --release
 2. `approval.md` 里有用户明确的放行记录：日期、版本号、放行范围（发工厂 / 裁样衣 / 仅内部看样，三选一写清）；
 3. `design.json` 的 `open_items` 为空——有 OPEN 项时 `--release` 必须失败，哪怕用户口头说“先发”，也要先把 OPEN 项清掉或在 approval.md 里逐项写明“已知风险、用户坚持放行”。
 
-**agent 没有放行权。** 脚本退出非 0 时，agent 的唯一正确动作是停下来、把失败项原样报给用户，不能换个说法再报一次、不能自己改数让它通过。
+**agent 没有放行权。** 工具返回 passed=false（CLI 退出非 0）时，agent 的唯一正确动作是停下来、把失败项原样报给用户，不能换个说法再报一次、不能自己改数让它通过。
 
 ## 交付用语
 

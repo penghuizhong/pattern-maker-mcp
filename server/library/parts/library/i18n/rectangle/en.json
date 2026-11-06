@@ -1,0 +1,22 @@
+{
+  "t": "Library/Rectangle",
+  "d": "A rectangle from the library of FreeSewing design parts",
+  "p": {
+    "rectangle": "Rectangle"
+  },
+  "s": {},
+  "o": {
+    "noSa": {
+      "t": "No Seam Allowance",
+      "d": "Explicitly disabled seam allowance on this part, regardless of the pattern settings"
+    },
+    "rectangleHeight": {
+      "t": "Rectangle height",
+      "d": "Height of the rectangle"
+    },
+    "rectangleWidth": {
+      "t": "Rectangle width",
+      "d": "Width of the rectangle"
+    }
+  }
+}
