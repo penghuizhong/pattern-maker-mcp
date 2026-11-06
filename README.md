@@ -1,4 +1,4 @@
-# Pattern Making (skill, v0.1.0)
+# Pattern Making
 
 制版 skill：把用户需求变成版本化的纸样 job。先写结构单，围度只认锁定的表，几何由确定性脚本或引擎算，校验门 + 审批门通过后才能放行。
 
@@ -26,11 +26,11 @@ python3 scripts/check_job.py --job examples/womens-suit-M --release
 
 ## 版本管理
 
-- 当前版本见 `VERSION`（语义化版本：主.次.修订）。
-- 每次改动记 `CHANGELOG.md`，先写条目再发版。
-- 发版时在 git 里打 tag：`v<版本号>`（如 `v0.1.0`），tag 随分支一起推。
+- 版本号只写在 `SKILL.md` 里（frontmatter 的 `version` 字段，标题与它保持一致），其他文件不写版本号，防不同步。
+- 每次改动先在 `CHANGELOG.md` 里写条目（按日期记）再发版。
+- 发版时在 git 里按 `SKILL.md` 的 version 打 tag，tag 随分支一起推。
 
-## v0.1 不承诺的事
+## 现阶段不承诺的事
 
 - 没有工业西装纸样原型（驳头、袖窿、挂面、半毛衬）：下一阶段单独写。
 - 没有排料、面料缩率模型、工艺单自动生成。
